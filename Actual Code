@@ -1,0 +1,2748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whispers of the Void</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script> 
+    <style>
+        :root {
+            --main-bg-color: #0a0814;
+            --text-color: #c0c0d0;
+            --primary-accent: #a855f7; /* Purple */
+            --secondary-accent: #302050;
+            --button-bg: #181028;
+            --button-hover-bg: #282038;
+            --button-border: #302050;
+            --button-hover-border: #403060;
+            --input-bg: #181028;
+            --input-border: #302050;
+            --modal-bg: rgba(10, 8, 20, 0.95);
+            --modal-content-bg: #100c20;
+            --title-color: #a855f7; /* Purple for titles */
+            --text-highlight: #e0e0ff;
+            --scrollbar-thumb-bg: var(--primary-accent);
+            --scrollbar-track-bg: var(--secondary-accent);
+        }
+
+        html, body {
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'VT323', monospace;
+            background-color: var(--main-bg-color);
+            color: var(--text-color);
+            image-rendering: pixelated;
+            overscroll-behavior: none;
+            background-image: url('https://placehold.co/1920x1080/0a0814/302050?text=Loading+Background...'); 
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+        }
+        .font-creepster {
+            font-family: 'Press Start 2P', cursive;
+        }
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 1rem;
+            background-color: rgba(10, 8, 20, 0.92);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .active-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #pre-menu-loading-screen {
+            background-color: #000000;
+            color: #00ff00;
+            text-align: center;
+            z-index: 3000;
+        }
+        #pre-menu-loading-screen img#company-logo {
+            max-width: 80%;
+            width: 300px;
+            height: auto;
+            margin-bottom: 2rem;
+            border: 2px solid #008000;
+            box-shadow: 0 0 15px #00ff00, 0 0 25px #00cc00;
+            background-color: #050505;
+        }
+        #pre-menu-loading-screen p#trigger-warning-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 1rem;
+            text-shadow: 0 0 3px #00dd00;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        button, input[type="text"], textarea, input[type="number"], select {
+            background-color: var(--button-bg);
+            color: var(--text-highlight);
+            border: 2px solid var(--button-border);
+            border-radius: 0;
+            padding: 0.6rem 0.85rem;
+            margin-bottom: 0.75rem;
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            box-shadow: 2px 2px 0px #0a0814;
+            transition: transform 0.1s ease-out, filter 0.1s ease-out, background-color 0.2s, border-color 0.2s;
+        }
+        #load-game-label-btn {
+            background-color: var(--button-bg);
+            color: var(--text-highlight);
+            border: 2px solid var(--button-border);
+            box-shadow: 2px 2px 0px #0a0814;
+        }
+        #load-game-label-btn:hover {
+            background-color: var(--button-hover-bg);
+            border-color: var(--button-hover-border);
+            transform: scale(1.03);
+            filter: brightness(1.1);
+        }
+
+        input[type="range"] {
+            padding: 0;
+            accent-color: var(--primary-accent);
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        button:hover:not(:disabled) {
+            background-color: var(--button-hover-bg);
+            border-color: var(--button-hover-border);
+            transform: scale(1.03);
+            filter: brightness(1.1);
+        }
+        button:active:not(:disabled) {
+            box-shadow: inset 1px 1px 0px #0a0814;
+            transform: scale(0.98) translate(1px, 1px);
+        }
+        button:disabled {
+            background-color: #18102880;
+            border-color: #30205080;
+            color: #d0d0e080;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+            filter: none;
+        }
+        input[type="checkbox"], input[type="radio"] {
+            padding: 0;
+            margin-right: 0.5rem;
+            height: 1.2rem; width: 1.2rem;
+            accent-color: var(--primary-accent);
+            border: 1px solid var(--input-border);
+            image-rendering: pixelated;
+            appearance: none;
+            background-color: var(--input-bg);
+            position: relative;
+            box-shadow: 1px 1px 0px #0a0814;
+            vertical-align: middle;
+        }
+        input[type="checkbox"]:checked::before, input[type="radio"]:checked::before {
+            content: 'X';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-highlight);
+            font-size: 0.9rem;
+        }
+         input[type="radio"]:checked::before {
+            content: '•';
+            font-size: 1.4rem;
+            line-height: 0.9rem;
+        }
+
+        textarea {
+            min-height: 80px;
+            width: 100%;
+        }
+        .modal {
+            /* display: none; */ /* Controlled by JS adding/removing active-modal */
+            opacity: 0;
+            visibility: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-bg);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            box-sizing: border-box;
+            transition: opacity 0.25s ease-in-out, visibility 0s linear 0.25s;
+        }
+        .modal.active-modal {
+            display: flex; /* Needs to be flex to center content */
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.25s ease-in-out, visibility 0s linear 0s;
+        }
+        .modal-content {
+            background-color: var(--modal-content-bg);
+            padding: 1.5rem;
+            border-radius: 0;
+            border: 3px solid var(--secondary-accent);
+            max-width: 90%;
+            width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 4px 4px 0px #0a0814;
+            transform: scale(0.95); /* Initial state for pop-in effect */
+            transition: transform 0.25s ease-in-out;
+        }
+        .modal.active-modal .modal-content {
+            transform: scale(1); /* Final state for pop-in effect */
+        }
+
+        #story-display, #ask-gm-answer-area {
+            border: 2px solid var(--secondary-accent);
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background-color: #100c20;
+            border-radius: 0;
+            white-space: pre-wrap;
+            box-shadow: inset 2px 2px 0px #0a0814;
+            line-height: 1.4;
+            overflow-y: auto;
+        }
+        #ask-gm-answer-area { min-height: 40px; }
+
+        #visualize-hint-text {
+            min-height: 30px;
+            font-style: italic;
+            color: #a090b0;
+            padding: 0.5rem;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            border: 1px dashed var(--secondary-accent);
+            border-radius: 0;
+            text-align: center;
+            background-color: #100c20;
+            box-shadow: inset 1px 1px 0px #0a0814;
+            white-space: pre-wrap;
+        }
+
+        #image-display-area img, .character-portrait, #visualize-image {
+            max-width: 100%;
+            border-radius: 0;
+            margin-top: 0.5rem;
+            border: 2px solid var(--secondary-accent);
+            box-shadow: 2px 2px 0px #0a0814;
+            background-color: var(--button-bg);
+        }
+        #image-display-area img { max-height: 240px; display: none; }
+        #visualize-image { max-height: 300px; margin-bottom: 0.5rem; }
+        .character-portrait { width: 64px; height: 64px; object-fit: cover; margin-right: 0.5rem; image-rendering: pixelated;}
+
+        .character-card {
+            background-color: var(--button-bg);
+            border: 2px solid var(--secondary-accent);
+            border-radius: 0;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 2px 2px 0px #0a0814;
+        }
+        .loading-overlay {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background-color: rgba(10,8,20,0.95);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-highlight);
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        .current-player-highlight {
+            border: 2px solid var(--primary-accent) !important;
+            box-shadow: 0 0 8px var(--primary-accent), 2px 2px 0px #0a0814 !important;
+        }
+        .game-mode-button.selected {
+            background-color: var(--primary-accent);
+            border-color: var(--primary-accent);
+            color: #fff;
+        }
+        .ability-item, .inventory-item-display {
+            border-bottom: 2px solid var(--secondary-accent);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        @keyframes titleFlicker {
+            0%, 100% { text-shadow: 0 0 5px var(--title-color), 0 0 10px var(--title-color), 0 0 15px #fff, 0 0 20px var(--primary-accent); color: var(--title-color); }
+            50% { text-shadow: 0 0 3px var(--title-color), 0 0 8px var(--title-color), 0 0 12px #fff, 0 0 15px var(--primary-accent); color: #e0e0ff; }
+        }
+        #main-title {
+            animation: titleFlicker 3s infinite alternate;
+            color: var(--title-color);
+        }
+        #game-screen .flex-col.lg\:w-2\/3, #game-screen .flex-col.lg\:w-1\/3 {
+            height: 100%;
+            max-height: calc(100vh - 2rem);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track-bg);
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb-bg);
+            border-radius: 0px;
+            border: 1px solid var(--secondary-accent);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-accent);
+            filter: brightness(1.2);
+        }
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb-bg) var(--scrollbar-track-bg);
+        }
+
+        #inventory-character-card-area {
+            margin-bottom: 1rem;
+        }
+        #inventory-items-list-container {
+            border: 2px solid var(--secondary-accent);
+            padding: 0.75rem;
+            background-color: #100c20;
+            box-shadow: inset 2px 2px 0px #0a0814;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+        .inventory-item-actions button, .inventory-item-actions select {
+            font-size: 0.9rem;
+            padding: 0.3rem 0.5rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="pre-menu-loading-screen" class="screen active-screen">
+        <img id="company-logo" src="./assets/images/Cyclic_Gate_Logo.png" alt="Company Logo"
+             onerror="this.onerror=null; this.src='https://placehold.co/300x150/050505/00FF00?text=Logo+Error';">
+        <p id="trigger-warning-text" class="mt-4">
+            Disclaimer: Cyclic Gate Studios is not responsible for any existential crises, sudden cravings for calamari,
+            unexplained shadows in the periphery, lost sanity points, or unexpected visits from beings beyond mortal comprehension.
+            If you start hearing whispers from the void, please consult your nearest cultist... or maybe just take a break. You've been warned.
+        </p>
+        <button id="agree-btn" class="mt-6 py-2 px-6 text-lg">I Understand and Agree</button>
+    </div>
+
+    <audio id="ambient-audio-player" loop></audio>
+    <audio id="combat-audio-player" loop></audio>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <p>The veil thins...</p>
+    </div>
+
+    <div id="main-menu-screen" class="screen text-center p-4">
+        <div class="w-full max-w-md">
+            <h1 id="main-title" class="text-5xl font-creepster text-purple-400 mb-8">Whispers of the Void</h1>
+            <button id="new-game-btn" class="w-full py-3 mb-4 text-lg">New Game</button>
+            <label for="load-file-input" id="load-game-label-btn" class="w-full py-3 mb-4 text-lg block cursor-pointer text-center">Load Game</label>
+            <input type="file" id="load-file-input" class="visually-hidden" accept=".txt,.json">
+            <button id="settings-btn-main" class="w-full py-3 mb-4 text-lg">Settings</button>
+            <button id="language-btn" class="w-full py-3 mb-4 text-lg">Language: English</button>
+            <button id="exit-game-btn" class="w-full py-3 text-lg mt-4 bg-red-600 hover:bg-red-700">Exit Game</button>
+        </div>
+    </div>
+
+    <div id="game-mode-screen" class="screen p-4">
+        <div class="w-full max-w-lg mx-auto">
+            <h2 id="game-mode-title" class="text-3xl font-creepster text-purple-400 mb-6 text-center">Choose Your Nightmare</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"> <button id="mode-lovecraftian-btn" data-mode="lovecraftian" class="game-mode-button w-full py-3 text-base selected">Lovecraftian</button>
+                <button id="mode-dnd-btn" data-mode="dnd" class="game-mode-button w-full py-3 text-base">D&D Style</button>
+                </div>
+            <div class="mb-4">
+                <label for="custom-game-mode" id="custom-mode-label" class="block mb-2 text-base">Or Describe Your Own:</label>
+                <textarea id="custom-game-mode" class="w-full p-2" placeholder="e.g., Sci-fi horror on a derelict spaceship..."></textarea>
+            </div>
+            <div class="mb-6">
+                <label for="party-name-input" id="party-name-label" class="block mb-2 text-base">Party Name (Optional):</label>
+                <input type="text" id="party-name-input" class="w-full p-2" placeholder="e.g., The Miskatonic Irregulars">
+            </div>
+            <button id="proceed-to-char-creation-btn" class="w-full py-3 mt-4 text-lg">Proceed to Characters</button>
+            <button id="back-to-main-menu-gm-btn" class="w-full py-3 mt-2 text-lg">Back to Main Menu</button>
+        </div>
+    </div>
+
+    <div id="character-creation-screen" class="screen p-4">
+        <div class="w-full max-w-lg mx-auto">
+            <h2 id="char-creation-title" class="text-3xl font-creepster text-purple-400 mb-6 text-center">Create Your Characters</h2>
+            <div class="mb-4">
+                <label for="player-count-select" id="player-count-label" class="block mb-2 text-base">Number of Players:</label>
+                <select id="player-count-select" class="w-full p-2">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <div id="player-details-container" class="space-y-6 max-h-[50vh] overflow-y-auto">
+                </div>
+            <button id="start-adventure-btn" class="w-full py-3 mt-6 text-lg">Begin the Adventure</button>
+            <button id="back-to-menu-cc-btn" class="w-full py-3 mt-2 text-lg">Back to Game Modes</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="screen p-2 sm:p-4 game-screen-container">
+        <div class="flex flex-col lg:flex-row gap-4 max-w-7xl mx-auto h-full w-full">
+            <div class="lg:w-2/3 flex flex-col h-full">
+                <h2 id="unfolding-nightmare-title" class="text-2xl font-creepster text-purple-400 mb-3 text-center lg:text-left">The Unfolding Nightmare</h2>
+                <div id="story-display" class="flex-grow min-h-0">
+                    Welcome, investigator. The shadows lengthen, and the path ahead is uncertain...
+                </div>
+                <div class="flex flex-wrap justify-center items-center mt-2 gap-2">
+                    <button id="visualize-scene-btn" class="py-2 px-4 text-base">Visualize Scene (Cost: 3 Sanity)</button>
+                </div>
+            </div>
+
+            <div class="lg:w-1/3 flex flex-col h-full">
+                <h3 id="investigators-title-gs" class="text-2xl font-creepster text-purple-400 mb-3 text-center lg:text-left hidden">Characters</h3> <div id="current-player-turn-indicator" class="mb-3 p-2 bg-purple-900 text-center text-base">
+                    Waiting for players...
+                </div>
+
+                <div id="boss-action-choice-area" class="hidden mb-3 p-3 bg-red-900 text-center">
+                    <p id="boss-prompt-text" class="mb-2">As an Eldritch God, will you intervene this turn?</p>
+                    <button id="boss-act-yes-btn" class="py-2 px-4 text-base mr-2">Yes, Unleash Chaos</button>
+                    <button id="boss-act-no-btn" class="py-2 px-4 text-base">No, Observe</button>
+                </div>
+
+                <div id="player-input-area">
+                    <h3 id="your-action-title" class="text-xl font-creepster text-purple-400 mb-2">Your Action:</h3>
+                    <textarea id="player-action-input" placeholder="What do you do?" class="w-full p-2 text-base h-20"></textarea>
+                    <div class="flex gap-2 mt-2">
+                        <button id="submit-action-btn" class="flex-grow py-2 text-base">Submit Action</button>
+                        <button id="open-abilities-modal-btn" class="flex-grow py-2 text-base">Abilities</button>
+                    </div>
+                </div>
+
+                <div class="mt-3 space-y-2 flex-grow overflow-y-auto"> <button id="settings-btn-game" class="w-full py-2 text-base">Settings</button>
+                    <button id="ask-gm-modal-btn" class="w-full py-2 text-base">Ask GM a Question</button>
+                    <button id="show-inventory-btn" class="w-full py-2 text-base">Inventory (I)</button>
+                    <button id="retry-gm-btn" class="w-full py-2 text-base">Retry GM Response</button>
+                    <button id="save-game-state-btn" class="w-full py-2 text-base">Save Campaign</button>
+                    <button id="fullscreen-btn-game" class="w-full py-2 text-base">Toggle Fullscreen</button>
+                    <button id="main-menu-gs-btn" class="w-full py-2 text-base">Return to Main Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="inventory-modal" class="modal">
+        <div class="modal-content w-full max-w-lg"> <h3 id="inventory-title-modal" class="text-2xl font-creepster text-purple-400 mb-4">Inventory</h3>
+            <div id="inventory-character-card-area" class="mb-4">
+                </div>
+            <h4 id="items-list-title" class="text-lg font-creepster text-purple-300 mb-2">Items:</h4>
+            <div id="inventory-items-list-container" class="mb-4">
+                 </div>
+            <button id="close-inventory-btn" class="w-full py-2">Close</button>
+        </div>
+    </div>
+
+    <div id="abilities-modal" class="modal">
+        <div class="modal-content w-full max-w-lg">
+            <h3 id="abilities-title-modal" class="text-2xl font-creepster text-purple-400 mb-4">Abilities</h3>
+            <div id="abilities-content" class="mb-4 space-y-3">
+                </div>
+            <button id="close-abilities-btn" class="w-full py-2">Close</button>
+        </div>
+    </div>
+
+    <div id="ask-gm-modal" class="modal">
+        <div class="modal-content w-full max-w-lg">
+            <h3 id="ask-gm-title-modal" class="text-2xl font-creepster text-purple-400 mb-4">Ask the GM</h3>
+            <label for="gm-question-input" id="gm-question-label" class="block mb-2">Your Question:</label>
+            <textarea id="gm-question-input" class="w-full p-2 text-base h-24" placeholder="e.g., What does the strange symbol on the wall look like?"></textarea>
+            <button id="submit-gm-question-btn" class="w-full py-2 mt-2 text-base">Submit Question</button>
+            <div id="ask-gm-answer-area" class="mt-3 hidden">
+                <strong class="text-purple-300">GM's Answer:</strong>
+                <p id="gm-answer-text"></p>
+            </div>
+            <button id="close-ask-gm-modal-btn" class="w-full py-2 mt-3">Close</button>
+        </div>
+    </div>
+
+    <div id="visualize-scene-modal" class="modal">
+        <div class="modal-content w-full max-w-xl">
+            <h3 id="visualize-title-modal" class="text-3xl font-creepster text-purple-400 mb-4">A Glimpse Beyond</h3>
+            <div id="visualize-image-container" class="text-center mb-3">
+                <img id="visualize-image" src="./assets/images/default-visual.png" alt="Visualized Scene" class="mx-auto"
+                     onerror="this.onerror=null; this.src='https://placehold.co/600x400/100c20/302050?text=Vision+Error';">
+            </div>
+            <div id="visualize-hint-text" class="text-sm p-2 my-2">
+                The mists swirl...
+            </div>
+            <button id="close-visualize-modal-btn" class="w-full py-2">Close Vision</button>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content w-full max-w-md">
+            <h3 id="settings-title-modal" class="text-2xl font-creepster text-purple-400 mb-6">Settings</h3>
+
+            <div class="mb-6">
+                <label for="volume-slider" id="volume-label" class="block mb-2 text-base">Master Volume:</label>
+                <input type="range" id="volume-slider" min="0" max="100" value="5" class="w-full">
+            </div>
+
+            <div class="mb-6">
+                <label for="theme-select" id="theme-select-label" class="block mb-2 text-base">UI Theme:</label>
+                <select id="theme-select" class="w-full p-2">
+                    <option value="theme-classic-void">Classic Void (Default)</option>
+                    <option value="theme-crimson-cult">Crimson Cult</option>
+                    <option value="theme-arcane-green">Arcane Green</option>
+                    <option value="theme-mono-pixel">Monochrome Pixel</option>
+                </select>
+            </div>
+            
+            <button id="mute-btn-settings" class="w-full py-2 mb-4 text-lg">Mute Music</button> <button id="fullscreen-btn-settings" class="w-full py-2 mb-4 text-lg">Toggle Fullscreen</button>
+
+            <div class="mb-6">
+                <h4 id="about-game-title" class="text-xl font-creepster text-purple-400 mb-2">About the Game</h4>
+                <p id="about-game-text" class="text-sm leading-relaxed">
+                    Whispers of the Void is an AI-driven narrative horror game where your choices shape the unfolding nightmare.
+                    Inspired by cosmic horror and classic RPGs, prepare to face unspeakable terrors and delve into mysteries that
+                    may shatter your sanity. This game uses generative AI for storytelling and visuals.
+                </p>
+            </div>
+
+            <button id="close-settings-btn" class="w-full py-2">Close Settings</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Global Variables & State ---
+        const apiKey = "AIzaSyAa_ekGwi-E0hQpcz-nJFyrJuiLfGLlfB0"; // User must replace this with their Gemini API Key
+        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const imagenApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+        // --- CORRECTED LOCAL ASSET PATHS ---
+        const AMBIENT_MUSIC_URL = "./assets/audio/dark-ambient-horror-cinematic-atmosphere-126802.mp3";
+        const COMBAT_MUSIC_URL = "./assets/audio/battle-of-the-dragons-8037.mp3";
+        const DEFAULT_PORTRAIT_URL = "./assets/images/default-portrait.png";
+        const DEFAULT_VISUAL_URL = "./assets/images/default-visual.png";
+        const COMPANY_LOGO_URL = "./assets/images/Cyclic_Gate_Logo.png";
+        const BACKGROUND_IMAGE_URL = "./assets/images/Background.png";
+
+
+        let gameState = {
+            currentScreen: 'pre-menu-loading-screen',
+            players: [],
+            currentPlayerIndex: 0,
+            turnActions: [],
+            storyLog: [],
+            currentScenario: "",
+            gmPromptHistory: [],
+            isAwaitingPlayerAction: true,
+            isGMProcessing: false,
+            currentLanguage: 'en',
+            supportedLanguages: ['en', 'es'],
+            selectedGameMode: 'lovecraftian',
+            customGameModePrompt: '',
+            partyName: '',
+            lastPlayerActions: [],
+            currentMusicTrack: 'ambient',
+            volumeLevel: 0.05, 
+            currentTheme: 'theme-classic-void',
+        };
+
+        const uiStrings = {
+            en: {
+                mainTitle: "Whispers of the Void", newGame: "New Game", loadGame: "Load Game", settings: "Settings",
+                language: "Language: English", fullscreen: "Toggle Fullscreen", exitFullscreen: "Exit Fullscreen",
+                muteMusic: "Mute Music", unmuteMusic: "Unmute Music", exitGame: "Exit Game",
+                gameModeTitle: "Choose Your Nightmare", modeLovecraftian: "Lovecraftian", modeDnD: "D&D Style",
+                customModeLabel: "Or Describe Your Own:", customModePlaceholder: "e.g., Sci-fi horror on a derelict spaceship...",
+                partyNameLabel: "Party Name (Optional):", partyNamePlaceholder: "e.g., The Miskatonic Irregulars",
+                proceedToCharCreation: "Proceed to Characters",
+                charCreationTitle: "Create Your Characters",
+                playerCountLabel: "Number of Players:",
+                characterLabel: "Character", playAsMonsterLabel: "Play as Creature?", playAsGodLabel: "Play as Entity?",
+                godSelectionLabel: "Choose Your Entity:", godCthulhu: "The Sleeper (Cthulhu-like)", godNyarlathotep: "The Messenger (Nyarlathotep-like)", godAzathoth: "The Chaos (Azathoth-like)", godCustom: "Custom Entity",
+                monsterLabel: "Creature", godLabel: "Entity",
+                nameLabel: "Name:", descriptionLabel: "Description & Background:",
+                namePlaceholder: "e.g., Prof. Armitage / Grok the Barbarian / The Star-Spawn", descPlaceholder: "e.g., A grizzled detective / A mighty warrior / An ancient terror...",
+                beginDescent: "Begin the Adventure",
+                backToMenu: "Back to Menu", backToGameModes: "Back to Game Modes",
+                unfoldingNightmareTitle: "The Unfolding Nightmare",
+                initialStory: "The stage is set, and the path ahead is uncertain...",
+                visualizeSceneButton: "Visualize Scene (Cost: 3 Sanity)",
+                hintDisplayDefault: "Glimpse the beyond...",
+                visualizeModalTitle: "A Glimpse Beyond", visualizeModalClose: "Close Vision", visualizeModalHintDefault: "The mists swirl... What secrets do they hold?",
+                visualizeScene: "Visualize Scene", investigatorsTitleGS: "Characters", // Kept for key, though element is hidden
+                waitingForPlayers: "Waiting for players...", yourActionTitle: "Your Action:", bossActionPrompt: "As {BOSS_NAME}, will you intervene?",
+                bossActYes: "Yes, Unleash Chaos", bossActNo: "No, Observe",
+                playerActionPlaceholder: "What do you do?", submitAction: "Submit Action", useAbilityButton: "Abilities",
+                inventoryButton: "Inventory (I)", saveCampaign: "Save Campaign", returnToMainMenu: "Return to Main Menu",
+                retryGMButton: "Retry GM Response", askGMButton: "Ask GM a Question", askGMModalTitle: "Ask the GM", gmQuestionLabel: "Your Question:", gmQuestionPlaceholder: "e.g., What does the strange symbol on the wall look like?", submitGMQuestion: "Submit Question", gmAnswerPrefix: "GM's Answer:",
+                abilitiesModalTitle: "Abilities", useAbilityAction: "Use",
+                inventoryTitleModal: "Inventory", closeButton: "Close", loadingMessage: "The veil thins...",
+                errorPlayerDetails: "Please provide a name and description for Character {NUM}.",
+                errorActionNeeded: "Please describe your action.", gmPonders: "The GM ponders your fates...",
+                awaitingActionFrom: "Awaiting action from: {PLAYER_NAME}", errorCurrentPlayer: "Error: Current player not found.",
+                noInvestigators: "No characters present.", allActionsReceived: "All actions received. Processing...",
+                gmWeavesNarrative: "The GM weaves the narrative...",
+                gmErrorGeneric: "An unspeakable entity briefly warped reality, and the GM's voice was lost in the static. The air grows colder. What was that...?",
+                sanityChangeEffect: "{PLAYER_NAME}'s sanity changes by {CHANGE} due to: {REASON}. New sanity: {SANITY}.",
+                damageEffect: "{PLAYER_NAME} takes {DAMAGE} damage from {REASON}! Remaining HP: {HP}.",
+                itemFoundEffect: "{PLAYER_NAME} found: {ITEM_NAME}.", itemLostEffect: "{PLAYER_NAME} lost: {ITEM_NAME}.",
+                itemUsedEffect: "{PLAYER_NAME} uses: {ITEM_NAME}.", // New
+                itemGiveAttemptEffect: "{PLAYER_NAME} attempts to give {ITEM_NAME} to {TARGET_NAME}.", // New
+                itemGiveSuccessEffect: "{GIVER_NAME} gives {ITEM_NAME} to {RECEIVER_NAME}.", // New
+                itemGiveFailEffect: "{GIVER_NAME} could not give {ITEM_NAME} to {RECEIVER_NAME}: {REASON}.", // New
+                abilityUsedEffect: "{PLAYER_NAME} uses {ABILITY_NAME}! (Cost: {COST} Sanity)",
+                visionSanityLoss: "{PLAYER_NAME} gazes into the abyss, losing 3 sanity.",
+                visionHintPrefix: "Ominous Hint: ",
+                visionNotification: "{PLAYER_NAME} stares into the distance, a flicker of understanding—or madness—in their eyes.",
+                visionFailed: "The vision failed to materialize. The mists remain thick.",
+                noInvestigatorsInInventory: "No characters have joined yet.", nothingOfNote: "Nothing of note.",
+                campaignSaved: "Campaign saved!", errorSaving: "Error saving campaign.",
+                campaignLoaded: "Campaign loaded!", failedLoad: "Failed to load save file.",
+                scenarioStartInstruction: "Generate a compelling and eerie starting scenario for the characters. Describe the initial setting, a hint of mystery or unease, and what the characters perceive. Keep it to 2-3 paragraphs. Do not ask what the players do yet, just set the scene.",
+                itemAbilityPromptInstruction_Investigator: `Based on this, suggest one starting mundane item AND 5 unique, subtly supernatural "abilities" or "knacks". For each ability, provide a name, a brief description of its effect, and a sanity cost (0-15). Format as: ITEM: [Item Name]. ABILITIES: 1. [Ability1 Name] - [Description1] - COST: [Cost1] | 2. [Ability2 Name] - [Description2] - COST: [Cost2] | ... | 5. [Ability5 Name] - [Description5] - COST: [Cost5]. Keep it concise and thematic.`,
+                itemAbilityPromptInstruction_Monster: `This player is a CREATURE. Suggest 5 unique monstrous "abilities". Creatures do NOT get mundane items. For each ability, provide a name, a brief description of its effect, and a sanity/resource cost (0-20, representing instability or a special resource). Format as: ITEM: None. ABILITIES: 1. [Ability1 Name] - [Description1] - COST: [Cost1] | 2. [Ability2 Name] - [Description2] - COST: [Cost2] | ... | 5. [Ability5 Name] - [Description5] - COST: [Cost5]. Keep it concise and thematic.`,
+                itemAbilityPromptInstruction_God: `This player is an ENTITY ({GOD_TYPE}). Suggest 5 immensely powerful and thematic "abilities". Entities do NOT get mundane items and their sanity is vast/irrelevant for costs (use 0 for cost). For each ability, provide a name and a brief description of its world-altering or terrifying effect. Format as: ITEM: None. ABILITIES: 1. [Ability1 Name] - [Description1] - COST: 0 | 2. [Ability2 Name] - [Description2] - COST: 0 | ... | 5. [Ability5 Name] - [Description5] - COST: 0. Keep it concise and thematic to the chosen entity.`,
+                gmSystemPromptInstruction_Base: `Player abilities might be used, denoted by "uses ability: [Ability Name]". Player might use an item: "uses item: [Item Name]". Player might attempt to give an item: "attempts to give [Item Name] to [Target Player Name]". Narrate the effect of abilities and item uses. For item giving, determine if it's plausible (e.g., proximity). If successful, use [ITEM_TRANSFER: GiverName, ReceiverName, ItemName, Reason for success (e.g., close enough)]. If failed, use [ITEM_GIVE_FAIL: GiverName, ReceiverName, ItemName, Reason for failure (e.g., too far apart)]. If a player is a Creature or an Entity, narrate their actions and presence as threatening, alien, or overwhelmingly powerful. Other characters should react with fear, hostility, or awe. Narrate outcomes. Describe changes to the scene, introduce new elements, or have NPCs react. If events warrant it, explicitly state sanity changes: [SANITY_CHANGE: Player Name, +/-Value, Reason]. Calm moments or successes might restore sanity. If items are found/lost (other than transfers): [ITEM_FOUND: Player Name, Item Name] or [ITEM_LOST: Player Name, Item Name]. If damage is dealt: [DAMAGE: Player Name, Amount, Description]. If combat starts: [MUSIC_SWITCH: combat]. If things calm: [MUSIC_SWITCH: ambient]. Conclude by setting the scene for the next round. Do not explicitly ask "What do you do?". Maintain a tense, mysterious atmosphere. Be descriptive. Progress the story. If players are stuck, subtly guide or introduce an event. If a player has low sanity (e.g., below 30), subtly weave hallucinatory or distorted perceptions into their personal experience.`,
+                gmSystemPromptInstruction_DnD: `You are the Dungeon Master for a D&D style fantasy adventure. Player abilities might be used: "uses ability: [Ability Name]". Player might use an item: "uses item: [Item Name]". Player might attempt to give an item: "attempts to give [Item Name] to [Target Player Name]". Narrate effects. For item giving, determine plausibility. If successful: [ITEM_TRANSFER: GiverName, ReceiverName, ItemName, Reason]. If failed: [ITEM_GIVE_FAIL: GiverName, ReceiverName, ItemName, Reason]. Narrate Creature/Entity actions as powerful, misunderstood, or villainous. Other characters react appropriately. Narrate outcomes. Describe scene changes, new elements, NPC reactions. If warranted, state sanity/morale changes: [SANITY_CHANGE: Player Name, +/-Value, Reason]. Treasure, quest steps, heroism might restore sanity/morale. Items found/lost (other than transfers): [ITEM_FOUND: Player Name, Item Name] or [ITEM_LOST: Player Name, Item Name]. Damage: [DAMAGE: Player Name, Amount, Description]. Combat: [MUSIC_SWITCH: combat]. Calm: [MUSIC_SWITCH: ambient]. Conclude by setting the scene. Do not ask "What do you do?". Maintain an adventurous atmosphere. Be descriptive. Progress story. If stuck, hint or add event. Low sanity/morale (below 30): describe as fearful, hesitant, demoralized.`,
+                askGMQuestionPrompt: `A player has a question about the current situation: "[PLAYER_QUESTION]". Current Scenario: {CURRENT_SCENARIO}. Player States: {PLAYER_STATES}. Answer concisely in one or two sentences based on what the characters would reasonably know or perceive. Do not advance the story or ask what they do next.`,
+                imageHintPromptAddition: `Also, provide a brief, ominous one-sentence hint or premonition related to this scene, formatted as: HINT: [Your hint here].`,
+                initialEndowmentHistory: "Initial Endowment: Item: {ITEM}. Abilities: {ABILITIES_LIST}",
+                endowmentMysteryHistory: "Their initial endowment remains shrouded in mystery due to an unforeseen disturbance.",
+                actionHistory: "Action: {ACTION}", sanityHistory: "Sanity changed by {CHANGE} (to {SANITY}) because: {REASON}.",
+                foundHistory: "Found: {ITEM_NAME}.", lostHistory: "Lost: {ITEM_NAME}.",
+                defaultScenario: "A thick, unnatural fog rolls in, obscuring your vision. An unsettling silence hangs in the air, broken only by your own breathing. You find yourselves standing before a dilapidated, ancient manor, its windows like vacant eyes staring into your souls. The path that led you here has vanished.",
+                defaultItem: "Worn Leather Journal", defaultAbilityName: "Keen Observation", defaultAbilityDesc: "Briefly gains heightened awareness of the immediate surroundings.", defaultAbilityCost: 0,
+                defaultPocketWatch: "Pocket Watch",
+                imageAltInitial: "The Veil is Thin", imageAltAdventure: "The Adventure Begins", imageAltFailed: "Vision Failed to Materialize",
+                noAbility: "No Ability", insufficientSanity: "Insufficient Sanity", sanityAbbr: "Cost: {COST} San",
+                visionCostError: "Not all present can bear the cost of such a vision.",
+                audioError: "Audio could not be started. Please click again or check browser permissions.",
+                pixelArtPortraitButton: "Generate Portrait",
+                settingsTitle: "Settings", volumeLabel: "Master Volume:", themeSelectLabel: "UI Theme:",
+                themeClassicVoid: "Classic Void (Default)", themeCrimsonCult: "Crimson Cult", themeArcaneGreen: "Arcane Green", themeMonoPixel: "Monochrome Pixel",
+                aboutGameTitle: "About the Game",
+                aboutGameText: "Whispers of the Void is an AI-driven narrative horror game where your choices shape the unfolding nightmare. Inspired by cosmic horror and classic RPGs, prepare to face unspeakable terrors and delve into mysteries that may shatter your sanity. This game uses generative AI for storytelling and visuals.",
+                agreeButton: "I Understand and Agree",
+                useItemButton: "Use", giveItemButton: "Give", giveToLabel: "Give to:", // New Inventory UI Strings
+                itemsListTitle: "Items:", // New
+            },
+            es: { // Spanish translations - NOTE: New strings need translation
+                mainTitle: "Susurros del Vacío", newGame: "Nuevo Juego", loadGame: "Cargar Juego", settings: "Ajustes",
+                language: "Idioma: Español", fullscreen: "Pantalla Completa", exitFullscreen: "Salir de Pantalla Completa",
+                muteMusic: "Silenciar Música", unmuteMusic: "Reactivar Música", exitGame: "Salir del Juego",
+                gameModeTitle: "Elige Tu Pesadilla", modeLovecraftian: "Lovecraftiano", modeDnD: "Estilo D&D",
+                customModeLabel: "O Describe la Tuya:", customModePlaceholder: "Ej: Terror sci-fi en una nave abandonada...",
+                partyNameLabel: "Nombre del Grupo (Opcional):", partyNamePlaceholder: "Ej: Los Irregulares de Miskatonic",
+                proceedToCharCreation: "Proceder a Personajes",
+                charCreationTitle: "Crea Tus Personajes",
+                playerCountLabel: "Número de Jugadores:",
+                characterLabel: "Personaje", playAsMonsterLabel: "¿Jugar como Criatura?", playAsGodLabel: "¿Jugar como Entidad?",
+                godSelectionLabel: "Elige Tu Entidad:", godCthulhu: "El Durmiente (tipo Cthulhu)", godNyarlathotep: "El Mensajero (tipo Nyarlathotep)", godAzathoth: "El Caos (tipo Azathoth)", godCustom: "Entidad Personalizada",
+                monsterLabel: "Criatura", godLabel: "Entidad",
+                nameLabel: "Nombre:", descriptionLabel: "Descripción y Trasfondo:",
+                namePlaceholder: "Ej: Prof. Armitage / Grok el Bárbaro / El Engendro Estelar", descPlaceholder: "Ej: Un detective curtido / Un guerrero poderoso / Un terror ancestral...",
+                beginDescent: "Comenzar la Aventura",
+                backToMenu: "Volver al Menú", backToGameModes: "Volver a Modos de Juego",
+                unfoldingNightmareTitle: "La Pesadilla Desplegándose",
+                initialStory: "El escenario está listo, y el camino por delante es incierto...",
+                visualizeSceneButton: "Visualizar Escena (Costo: 3 Cordura)",
+                hintDisplayDefault: "Vislumbra el más allá...",
+                visualizeModalTitle: "Un Vistazo al Más Allá", visualizeModalClose: "Cerrar Visión", visualizeModalHintDefault: "Las nieblas se arremolinan... ¿Qué secretos guardan?",
+                visualizeScene: "Visualizar Escena", investigatorsTitleGS: "Personajes",
+                waitingForPlayers: "Esperando jugadores...", yourActionTitle: "Tu Acción:", bossActionPrompt: "Como {BOSS_NAME}, ¿intervendrás este turno?",
+                bossActYes: "Sí, Desatar el Caos", bossActNo: "No, Observar",
+                playerActionPlaceholder: "¿Qué haces?", submitAction: "Enviar Acción", useAbilityButton: "Habilidades",
+                inventoryButton: "Inventario (I)", saveCampaign: "Guardar Campaña", returnToMainMenu: "Volver al Menú Principal",
+                retryGMButton: "Reintentar Respuesta del GM", askGMButton: "Preguntar al GM", askGMModalTitle: "Preguntar al GM", gmQuestionLabel: "Tu Pregunta:", gmQuestionPlaceholder: "Ej: ¿Cómo es el extraño símbolo en la pared?", submitGMQuestion: "Enviar Pregunta", gmAnswerPrefix: "Respuesta del GM:",
+                abilitiesModalTitle: "Habilidades", useAbilityAction: "Usar",
+                inventoryTitleModal: "Inventario", closeButton: "Cerrar", loadingMessage: "El velo se adelgaza...",
+                errorPlayerDetails: "Por favor, proporciona un nombre y descripción para el Personaje {NUM}.",
+                errorActionNeeded: "Por favor, describe tu acción.", gmPonders: "El GM reflexiona sobre vuestros destinos...",
+                awaitingActionFrom: "Esperando acción de: {PLAYER_NAME}", errorCurrentPlayer: "Error: Jugador actual no encontrado.",
+                noInvestigators: "No hay personajes presentes.", allActionsReceived: "Todas las acciones recibidas. Procesando...",
+                gmWeavesNarrative: "El GM teje la narrativa...",
+                gmErrorGeneric: "Una entidad innombrable distorsionó brevemente la realidad, y la voz del GM se perdió en la estática. El aire se enfría. ¿Qué fue eso...?",
+                sanityChangeEffect: "La cordura de {PLAYER_NAME} cambia en {CHANGE} debido a: {REASON}. Nueva cordura: {SANITY}.",
+                damageEffect: "¡{PLAYER_NAME} recibe {DAMAGE} de daño por {REASON}! PV restantes: {HP}.",
+                itemFoundEffect: "{PLAYER_NAME} encontró: {ITEM_NAME}.", itemLostEffect: "{PLAYER_NAME} perdió: {ITEM_NAME}.",
+                itemUsedEffect: "{PLAYER_NAME} usa: {ITEM_NAME}.", // New - Needs translation
+                itemGiveAttemptEffect: "{PLAYER_NAME} intenta dar {ITEM_NAME} a {TARGET_NAME}.", // New - Needs translation
+                itemGiveSuccessEffect: "{GIVER_NAME} da {ITEM_NAME} a {RECEIVER_NAME}.", // New - Needs translation
+                itemGiveFailEffect: "{GIVER_NAME} no pudo dar {ITEM_NAME} a {RECEIVER_NAME}: {REASON}.", // New - Needs translation
+                abilityUsedEffect: "¡{PLAYER_NAME} usa {ABILITY_NAME}! (Costo: {COST} Cordura)",
+                visionSanityLoss: "{PLAYER_NAME} contempla el abismo, perdiendo 3 de cordura.",
+                visionHintPrefix: "Pista Ominosa: ",
+                visionNotification: "{PLAYER_NAME} mira fijamente a la distancia, un destello de comprensión —o locura— en sus ojos.",
+                visionFailed: "La visión no logró materializarse. Las nieblas siguen espesas.",
+                noInvestigatorsInInventory: "Aún no se han unido personajes.", nothingOfNote: "Nada de importancia.",
+                campaignSaved: "¡Campaña guardada!", errorSaving: "Error al guardar la campaña.",
+                campaignLoaded: "¡Campaña cargada!", failedLoad: "Error al cargar el archivo de guardado.",
+                scenarioStartInstruction: "Genera un escenario inicial convincente y espeluznante para los personajes. Describe el entorno inicial, un indicio de misterio o inquietud, y lo que perciben los personajes. Limítalo a 2-3 párrafos. No preguntes qué hacen los jugadores todavía, solo establece la escena.",
+                itemAbilityPromptInstruction_Investigator: `Basado en esto, sugiere un objeto mundano inicial Y 5 "habilidades" o "dones" únicos y sutilmente sobrenaturales. Para cada habilidad, proporciona un nombre, una breve descripción de su efecto y un costo de cordura (0-15). Formato: OBJETO: [Nombre del objeto]. HABILIDADES: 1. [NombreHabilidad1] - [Descripción1] - COSTO: [Costo1] | 2. [NombreHabilidad2] - [Descripción2] - COSTO: [Costo2] | ... | 5. [NombreHabilidad5] - [Descripción5] - COSTO: [Costo5]. Sé conciso y temático.`,
+                itemAbilityPromptInstruction_Monster: `Este jugador es una CRIATURA. Sugiere 5 "habilidades" monstruosas únicas. Las criaturas NO obtienen objetos mundanos. Para cada habilidad, proporciona un nombre, una breve descripción de su efecto y un costo de cordura/recurso (0-20, representando inestabilidad o un recurso especial). Formato: OBJETO: Ninguno. HABILIDADES: 1. [NombreHabilidad1] - [Descripción1] - COSTO: [Costo1] | 2. [NombreHabilidad2] - [Descripción2] - COSTO: [Costo2] | ... | 5. [NombreHabilidad5] - [Descripción5] - COSTO: [Costo5]. Sé conciso y temático.`,
+                itemAbilityPromptInstruction_God: `Este jugador es una ENTIDAD ({GOD_TYPE}). Sugiere 5 "habilidades" inmensamente poderosas y temáticas. Las entidades NO obtienen objetos mundanos y su cordura es vasta/irrelevante para los costos (usa 0 para el costo). Para cada habilidad, proporciona un nombre y una breve descripción de su efecto aterrador o que altera el mundo. Formato: OBJETO: Ninguno. HABILIDADES: 1. [NombreHabilidad1] - [Descripción1] - COSTO: 0 | 2. [NombreHabilidad2] - [Descripción2] - COSTO: 0 | ... | 5. [NombreHabilidad5] - [Descripción5] - COSTO: 0. Sé conciso y temático para la entidad elegida.`,
+                gmSystemPromptInstruction_Base: `Los jugadores pueden usar habilidades: "usa habilidad: [Nombre Habilidad]". Pueden usar un objeto: "usa objeto: [Nombre Objeto]". Pueden intentar dar un objeto: "intenta dar [Nombre Objeto] a [Nombre Destinatario]". Narra el efecto de habilidades y usos de objetos. Para dar objetos, determina si es plausible (ej. proximidad). Si tiene éxito: [ITEM_TRANSFER: NombreDador, NombreReceptor, NombreObjeto, Razón éxito]. Si falla: [ITEM_GIVE_FAIL: NombreDador, NombreReceptor, NombreObjeto, Razón fallo]. Si un jugador es Criatura o Entidad, narra sus acciones como amenazantes, alienígenas o poderosas. Otros personajes reaccionan con miedo, hostilidad o asombro. Narra resultados. Describe cambios de escena, nuevos elementos, reacciones de NPCs. Si es necesario, indica cambios de cordura: [SANITY_CHANGE: Nombre Jugador, +/-Valor, Razón]. Momentos de calma o éxitos pueden restaurar cordura. Objetos encontrados/perdidos (no transferencias): [ITEM_FOUND: Nombre Jugador, Nombre Objeto] o [ITEM_LOST: Nombre Jugador, Nombre Objeto]. Daño: [DAMAGE: Nombre Jugador, Cantidad, Descripción]. Combate: [MUSIC_SWITCH: combat]. Calma: [MUSIC_SWITCH: ambient]. Concluye estableciendo la escena. No preguntes "¿Qué haces?". Mantén atmósfera tensa y misteriosa. Sé descriptivo. Avanza la historia. Si están atascados, guía sutilmente o introduce evento. Poca cordura (ej. <30): describe percepciones alucinatorias o distorsionadas.`,
+                gmSystemPromptInstruction_DnD: `Eres el Dungeon Master para una aventura de fantasía estilo D&D. Habilidades: "usa habilidad: [Nombre Habilidad]". Objetos: "usa objeto: [Nombre Objeto]". Dar objeto: "intenta dar [Nombre Objeto] a [Nombre Destinatario]". Narra efectos. Para dar, determina plausibilidad. Éxito: [ITEM_TRANSFER: Dador, Receptor, Objeto, Razón]. Fallo: [ITEM_GIVE_FAIL: Dador, Receptor, Objeto, Razón]. Criaturas/Entidades: narra acciones como poderosas, incomprendidas o malvadas. Otros reaccionan. Narra resultados. Cambios de escena, nuevos elementos, reacciones NPCs. Cambios cordura/moral: [SANITY_CHANGE: Jugador, +/-Valor, Razón]. Tesoros, misiones, heroísmo restauran. Objetos (no transferencias): [ITEM_FOUND: Jugador, Objeto] o [ITEM_LOST: Jugador, Objeto]. Daño: [DAMAGE: Jugador, Cantidad, Descripción]. Combate: [MUSIC_SWITCH: combat]. Calma: [MUSIC_SWITCH: ambient]. Concluye escena. No preguntes "¿Qué haces?". Atmósfera aventurera. Sé descriptivo. Avanza historia. Atascados: pistas o evento. Poca cordura/moral (<30): temerosos, vacilantes.`,
+                askGMQuestionPrompt: `Un jugador tiene una pregunta sobre la situación actual: "[PLAYER_QUESTION]". Escenario Actual: {CURRENT_SCENARIO}. Estados de los Jugadores: {PLAYER_STATES}. Responde concisamente en una o dos frases basándote en lo que los personajes sabrían o percibirían razonablemente. No avances la historia ni preguntes qué hacen a continuación.`,
+                imageHintPromptAddition: `Además, proporciona una breve y ominosa pista o premonición de una frase relacionada con esta escena, formateada como: PISTA: [Tu pista aquí].`,
+                initialEndowmentHistory: "Dotación Inicial: Objeto: {ITEM}. Habilidades: {ABILITIES_LIST}",
+                endowmentMysteryHistory: "Su dotación inicial permanece envuelta en misterio debido a una perturbación imprevista.",
+                actionHistory: "Acción: {ACTION}", sanityHistory: "Cordura cambiada en {CHANGE} (a {SANITY}) porque: {REASON}.",
+                foundHistory: "Encontrado: {ITEM_NAME}.", lostHistory: "Perdido: {ITEM_NAME}.",
+                defaultScenario: "Una niebla espesa y antinatural aparece, oscureciendo tu visión. Un silencio inquietante flota en el aire, roto solo por tu propia respiración. Os encontráis ante una antigua y ruinosa mansión, sus ventanas como ojos vacíos que os miran fijamente a las almas. El camino que os trajo aquí ha desaparecido.",
+                defaultItem: "Diario de Cuero Ajado", defaultAbilityName: "Observación Aguda", defaultAbilityDesc: "Gana brevemente una percepción aumentada del entorno inmediato.", defaultAbilityCost: 0,
+                defaultPocketWatch: "Reloj de Bolsillo",
+                imageAltInitial: "El Velo es Delgado", imageAltAdventure: "La Aventura Comienza", imageAltFailed: "La Visión Falló en Materializarse",
+                noAbility: "Sin Habilidad", insufficientSanity: "Cordura Insuficiente", sanityAbbr: "Costo: {COST} Cor",
+                visionCostError: "No todos los presentes pueden soportar el costo de tal visión.",
+                audioError: "El audio no pudo iniciarse. Haz clic de nuevo o revisa los permisos del navegador.",
+                pixelArtPortraitButton: "Generar Retrato",
+                settingsTitle: "Ajustes", volumeLabel: "Volumen Principal:", themeSelectLabel: "Tema de IU:",
+                themeClassicVoid: "Vacío Clásico (Defecto)", themeCrimsonCult: "Culto Carmesí", themeArcaneGreen: "Verde Arcano", themeMonoPixel: "Píxel Monocromo",
+                aboutGameTitle: "Sobre el Juego",
+                aboutGameText: "Susurros del Vacío es un juego narrativo de terror impulsado por IA donde tus elecciones dan forma a la pesadilla que se desarrolla. Inspirado en el horror cósmico y los RPG clásicos, prepárate para enfrentar terrores indescriptibles y adentrarte en misterios que pueden destrozar tu cordura. Este juego utiliza IA generativa para la narración y los efectos visuales.",
+                agreeButton: "Entiendo y Acepto",
+                useItemButton: "Usar", giveItemButton: "Dar", giveToLabel: "Dar a:", // New Inventory UI Strings - Needs translation
+                itemsListTitle: "Objetos:", // New - Needs translation
+            }
+        };
+
+        // Element selectors
+        let screensElements = {};
+        let mainMenuTitle, newGameBtn, loadGameLabelBtn, loadFileInputEl, languageMenuBtn, settingsBtnMain, exitGameBtn;
+        let gameModeTitleEl, modeLovecraftianBtnEl, modeDndBtnEl, customGameModeInputEl, customModeLabelEl, partyNameInputEl, partyNameLabelEl, proceedToCharCreationBtnEl, backToMainMenuGMBtnEl;
+        let charCreationTitleEl, playerCountSelectEl, playerCountLabelEl, playerDetailsContainerEl, startAdventureBtnEl, backToMenuCCBtnEl;
+        let unfoldingNightmareTitleEl, storyDisplayEl, visualizeSceneBtnEl;
+        let investigatorsTitleGSEl, /* charactersStatusAreaEl removed */ currentPlayerTurnIndicatorEl, bossActionChoiceAreaEl, bossPromptTextEl, bossActYesBtnEl, bossActNoBtnEl;
+        let playerInputAreaEl, yourActionTitleEl, playerActionInputEl, submitActionBtnEl, openAbilitiesModalBtnEl;
+        let showInventoryBtnEl, retryGMBtnEl, askGMModalBtnEl, saveGameStateBtnEl, mainMenuGSBtnEl, fullscreenGameBtnEl, settingsBtnGame;
+        let inventoryModalEl, inventoryTitleModalEl, inventoryCharacterCardAreaEl, inventoryItemsListContainerEl, itemsListTitleEl, closeInventoryBtnEl; // Added inventoryCharacterCardAreaEl, inventoryItemsListContainerEl, itemsListTitleEl
+        let abilitiesModalEl, abilitiesTitleModalEl, abilitiesContentEl, closeAbilitiesBtnEl;
+        let askGMModalEl, askGMTitleModalEl, gmQuestionInputEl, gmQuestionLabelEl, submitGMQuestionBtnEl, askGMAnswerAreaEl, gmAnswerTextEl, closeAskGMModalBtnEl;
+        let visualizeModalEl, visualizeTitleModalEl, visualizeImageContainerEl, visualizeImageEl, visualizeHintTextEl, closeVisualizeModalBtnEl;
+        let settingsModalEl, settingsTitleModalEl, volumeSliderEl, volumeLabelEl, themeSelectEl, themeSelectLabelEl, muteBtnSettings, fullscreenSettingsBtn, aboutGameTextEl, aboutGameTitleEl, closeSettingsBtnEl; // Added muteBtnSettings
+        let loadingOverlayEl, loadingOverlayTextEl;
+        let preMenuLoadingScreenEl, companyLogoEl, triggerWarningTextEl, agreeBtnEl;
+
+        let htmlAmbientPlayer = null;
+        let htmlCombatPlayer = null;
+        let hoverSynth, clickSynth; // For Tone.js sounds
+
+        let isMuted = false;
+        let audioContextStarted = false;
+
+        // --- Utility Functions ---
+        function S(key, replacements = {}) {
+            const lang = gameState.currentLanguage;
+            let str = uiStrings[lang]?.[key] || uiStrings['en']?.[key] || `MISSING_STRING[${key}]`;
+            for (const placeholder in replacements) {
+                str = str.replace(`{${placeholder}}`, replacements[placeholder]);
+            }
+            return str;
+        }
+
+        async function ensureAudioContext() {
+            if (!audioContextStarted) {
+                console.log("Attempting to start audio context on user interaction.");
+                // For HTMLMediaElement, user interaction is generally enough.
+                audioContextStarted = true; // Assume HTMLMediaElement will work after this interaction.
+
+                // For Tone.js, explicitly start or resume the context.
+                if (typeof Tone !== 'undefined') {
+                    if (Tone.context.state !== 'running') {
+                        try {
+                            await Tone.start(); // This is crucial for Tone.js
+                            console.log("Tone.js audio context started/resumed successfully.");
+                        } catch (e) {
+                            console.error("Error starting Tone.js audio context:", e);
+                            // audioContextStarted = false; // Potentially revert if Tone.js fails, but HTML audio might still work.
+                                                        // For now, keep audioContextStarted as true for HTMLMediaElement.
+                        }
+                    }
+                }
+            } else if (typeof Tone !== 'undefined' && Tone.context.state === 'suspended') {
+                 // If context was started but got suspended (e.g. tab backgrounded)
+                try {
+                    await Tone.context.resume();
+                    console.log("Tone.js audio context resumed.");
+                } catch (e) {
+                    console.error("Error resuming Tone.js audio context:", e);
+                }
+            }
+            return audioContextStarted; // Return based on general audio readiness
+        }
+        
+        function disposeMusic() {
+            console.log("Disposing HTML5 audio players...");
+            if (htmlAmbientPlayer) {
+                htmlAmbientPlayer.pause();
+                htmlAmbientPlayer.removeAttribute('src'); 
+                htmlAmbientPlayer.load(); 
+            }
+            if (htmlCombatPlayer) {
+                htmlCombatPlayer.pause();
+                htmlCombatPlayer.removeAttribute('src');
+                htmlCombatPlayer.load();
+            }
+            console.log("HTML5 audio players disposed/reset.");
+        }
+
+
+        async function loadAudioFiles() {
+            if (!audioContextStarted) {
+                 // This case should ideally be handled by ensureAudioContext first.
+                 console.warn("loadAudioFiles called before audio context is explicitly started. Attempting to ensure context.");
+                 if (!await ensureAudioContext()) {
+                     console.error("Failed to ensure audio context in loadAudioFiles. Audio loading aborted.");
+                     return false;
+                 }
+            }
+
+            htmlAmbientPlayer = document.getElementById('ambient-audio-player');
+            htmlCombatPlayer = document.getElementById('combat-audio-player');
+
+            if (!htmlAmbientPlayer || !htmlCombatPlayer) {
+                console.error("Audio elements not found in DOM!");
+                return false;
+            }
+            
+            let ambientLoaded = false;
+            let combatLoaded = false;
+
+            const loadPromise = (player, url, type) => {
+                return new Promise((resolve, reject) => {
+                    if (!player.src || player.currentSrc !== url) { // Only load if not already set or different
+                        console.log(`Setting src for ${type} player: ${url}`);
+                        player.src = url;
+                        player.load(); // Request browser to load the new source
+                    }
+
+                    // Check if already loaded or ready
+                    if (player.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA && player.currentSrc === url) {
+                        console.log(`${type} player already has enough data or is loaded.`);
+                        resolve(true);
+                        return;
+                    }
+                    
+                    const canPlayHandler = () => {
+                        console.log(`${type} player can play through.`);
+                        player.removeEventListener('canplaythrough', canPlayHandler);
+                        player.removeEventListener('error', errorHandler);
+                        resolve(true);
+                    };
+                    const errorHandler = (e) => {
+                        console.error(`Error loading ${type} player:`, e);
+                        player.removeEventListener('canplaythrough', canPlayHandler);
+                        player.removeEventListener('error', errorHandler);
+                        reject(false);
+                    };
+
+                    player.addEventListener('canplaythrough', canPlayHandler, { once: true });
+                    player.addEventListener('error', errorHandler, { once: true });
+                    
+                    // If src was just set, .load() is asynchronous. If already set, it might be loading or loaded.
+                    // If readyState is 0 (HAVE_NOTHING) and src is set, it means load() needs to be called or is in progress.
+                    if (player.readyState === 0 && player.src) {
+                        console.log(`Calling load() again for ${type} player as readyState is 0.`);
+                        player.load();
+                    }
+                });
+            };
+            
+            try {
+                ambientLoaded = await loadPromise(htmlAmbientPlayer, AMBIENT_MUSIC_URL, 'ambient');
+                combatLoaded = await loadPromise(htmlCombatPlayer, COMBAT_MUSIC_URL, 'combat');
+            } catch (error) {
+                console.error("Error during audio file loading promises:", error);
+                return false;
+            }
+
+            console.log("Audio sources ensured. Ambient loaded:", ambientLoaded, "Combat loaded:", combatLoaded);
+            return ambientLoaded && combatLoaded;
+        }
+
+
+        async function playMusic(trackType = 'ambient') {
+            if (!audioContextStarted ) {
+                console.warn("Audio context not started. Music playback deferred.");
+                // Attempt to start it now, this might happen if agree button wasn't the first interaction
+                if (!await ensureAudioContext()) {
+                    console.error("Failed to start audio context in playMusic. Aborting playback.");
+                    return;
+                }
+            }
+            
+            if (!htmlAmbientPlayer || !htmlCombatPlayer) { // Ensure players are selected
+                console.log("Audio players not selected, attempting to load them first.");
+                if(!await loadAudioFiles()){ // This will also select them
+                    console.error("Failed to load audio files in playMusic. Music playback aborted.");
+                    return;
+                }
+            }
+            // Double check src after loadAudioFiles
+             if (!htmlAmbientPlayer.src || !htmlCombatPlayer.src) {
+                console.error("Audio sources still not set after loadAudioFiles. Aborting playback.");
+                return;
+            }
+
+
+            console.log(`Attempting to switch music to: ${trackType}`);
+            gameState.currentMusicTrack = trackType;
+
+            const playerToStop = (trackType === 'ambient') ? htmlCombatPlayer : htmlAmbientPlayer;
+            const playerToStart = (trackType === 'ambient') ? htmlAmbientPlayer : htmlCombatPlayer;
+
+            if (playerToStop && !playerToStop.paused) {
+                playerToStop.pause();
+                if (playerToStop.readyState > 0) playerToStop.currentTime = 0;
+                console.log(`${playerToStop.id} paused.`);
+            }
+
+            if (playerToStart && !isMuted) {
+                applyVolume(); 
+
+                const attemptPlay = () => {
+                    const playPromise = playerToStart.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log(`${playerToStart.id} playing at volume ${playerToStart.volume}.`);
+                        }).catch(error => {
+                            console.error(`Error playing ${playerToStart.id}:`, error);
+                            const audioPlayErrorMsgId = 'audio-play-error';
+                            let errorMsgElement = document.getElementById(audioPlayErrorMsgId);
+                            if (!errorMsgElement) {
+                                errorMsgElement = document.createElement('p');
+                                errorMsgElement.id = audioPlayErrorMsgId;
+                                errorMsgElement.className = "text-yellow-400 text-center my-1 text-sm fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-[5000]";
+                                document.body.appendChild(errorMsgElement);
+                            }
+                            errorMsgElement.textContent = S('audioError') + ` (${error.name})`;
+                            setTimeout(() => { if (errorMsgElement) errorMsgElement.remove(); }, 7000);
+                        });
+                    }
+                };
+
+                if (playerToStart.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+                    attemptPlay();
+                } else {
+                     console.warn(`${playerToStart.id} not ready to play. State: ${playerToStart.readyState}. Will try once 'canplaythrough'.`);
+                     const canPlayListener = () => {
+                        console.log(`${playerToStart.id} is now ready (canplaythrough). Attempting play.`);
+                        attemptPlay();
+                        playerToStart.removeEventListener('canplaythrough', canPlayListener); // Clean up
+                     };
+                     playerToStart.addEventListener('canplaythrough', canPlayListener);
+                     // It's possible load() needs to be called if src was set but loading didn't initiate
+                     if (playerToStart.networkState === HTMLMediaElement.NETWORK_IDLE && playerToStart.src) {
+                         console.log(`Triggering load for ${playerToStart.id} as it's idle with a src.`);
+                         playerToStart.load();
+                     }
+                }
+            } else if (isMuted) {
+                 console.log("Music is muted, playback deferred for", playerToStart ? playerToStart.id : "target player");
+            }
+        }
+
+        async function handleMuteToggle() {
+            if (!audioContextStarted && !await ensureAudioContext()) {
+                console.warn("User interaction for audio not yet detected. Mute action may not affect playback until interaction.");
+                isMuted = !isMuted;
+                if (muteBtnSettings) muteBtnSettings.textContent = isMuted ? S('unmuteMusic') : S('muteMusic');
+                if (htmlAmbientPlayer) htmlAmbientPlayer.muted = isMuted;
+                if (htmlCombatPlayer) htmlCombatPlayer.muted = isMuted;
+                return;
+            }
+
+            isMuted = !isMuted;
+
+            if (htmlAmbientPlayer) htmlAmbientPlayer.muted = isMuted;
+            if (htmlCombatPlayer) htmlCombatPlayer.muted = isMuted;
+
+            if (isMuted) {
+                console.log("Music Muted (HTML5).");
+                if (muteBtnSettings) muteBtnSettings.textContent = S('unmuteMusic');
+                if (htmlAmbientPlayer && !htmlAmbientPlayer.paused) htmlAmbientPlayer.pause();
+                if (htmlCombatPlayer && !htmlCombatPlayer.paused) htmlCombatPlayer.pause();
+            } else {
+                console.log("Music Unmuted (HTML5).");
+                 if (!htmlAmbientPlayer || !htmlCombatPlayer || !htmlAmbientPlayer.src || !htmlCombatPlayer.src) {
+                    await loadAudioFiles(); 
+                }
+                applyVolume(); 
+                await playMusic(gameState.currentMusicTrack); 
+                if (muteBtnSettings) muteBtnSettings.textContent = S('muteMusic');
+            }
+        }
+
+
+        function applyVolume() {
+            if (!htmlAmbientPlayer || !htmlCombatPlayer) {
+                return;
+            }
+            const volumeValue = Math.max(0, Math.min(1, gameState.volumeLevel));
+            htmlAmbientPlayer.volume = volumeValue;
+            htmlCombatPlayer.volume = volumeValue;
+            console.log(`HTML5 Audio Volume set to: ${volumeValue * 100}%`);
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen()
+                    .catch(err => {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+             setTimeout(updateUITextForLanguage, 100);
+        }
+
+
+        function updateUITextForLanguage() {
+            const lang = gameState.currentLanguage;
+            // Main Menu
+            if (mainMenuTitle) mainMenuTitle.textContent = S('mainTitle');
+            if (newGameBtn) newGameBtn.textContent = S('newGame');
+            if (loadGameLabelBtn) loadGameLabelBtn.textContent = S('loadGame');
+            if (settingsBtnMain) settingsBtnMain.textContent = S('settings');
+            if (languageMenuBtn) languageMenuBtn.textContent = S('language', {LANG: lang === 'en' ? 'English' : 'Español'});
+            if (exitGameBtn) exitGameBtn.textContent = S('exitGame');
+
+            const fsButtonText = document.fullscreenElement ? S('exitFullscreen') : S('fullscreen');
+            if (fullscreenSettingsBtn) fullscreenSettingsBtn.textContent = fsButtonText;
+            if (fullscreenGameBtnEl) fullscreenGameBtnEl.textContent = fsButtonText;
+            
+            if (muteBtnSettings) muteBtnSettings.textContent = isMuted ? S('unmuteMusic') : S('muteMusic');
+
+            // Game Mode Screen
+            if (gameModeTitleEl) gameModeTitleEl.textContent = S('gameModeTitle');
+            if (modeLovecraftianBtnEl) modeLovecraftianBtnEl.textContent = S('modeLovecraftian');
+            if (modeDndBtnEl) modeDndBtnEl.textContent = S('modeDnD');
+            if (customModeLabelEl) customModeLabelEl.textContent = S('customModeLabel');
+            if (customGameModeInputEl) customGameModeInputEl.placeholder = S('customModePlaceholder');
+            if (partyNameLabelEl) partyNameLabelEl.textContent = S('partyNameLabel');
+            if (partyNameInputEl) partyNameInputEl.placeholder = S('partyNamePlaceholder');
+            if (proceedToCharCreationBtnEl) proceedToCharCreationBtnEl.textContent = S('proceedToCharCreation');
+            if (backToMainMenuGMBtnEl) backToMainMenuGMBtnEl.textContent = S('backToMenu');
+
+            // Character Creation Screen
+            if (charCreationTitleEl) charCreationTitleEl.textContent = S('charCreationTitle');
+            if (playerCountLabelEl) playerCountLabelEl.textContent = S('playerCountLabel');
+            if (startAdventureBtnEl) startAdventureBtnEl.textContent = S('beginDescent');
+            if (backToMenuCCBtnEl) backToMenuCCBtnEl.textContent = S('backToGameModes');
+            updatePlayerDetailForms(); 
+
+            // Game Screen
+            if (unfoldingNightmareTitleEl) unfoldingNightmareTitleEl.textContent = S('unfoldingNightmareTitle');
+            if (visualizeSceneBtnEl) visualizeSceneBtnEl.textContent = S('visualizeSceneButton');
+            if (investigatorsTitleGSEl) investigatorsTitleGSEl.textContent = S('investigatorsTitleGS'); 
+            if (yourActionTitleEl) yourActionTitleEl.textContent = S('yourActionTitle');
+            if (bossActYesBtnEl) bossActYesBtnEl.textContent = S('bossActYes');
+            if (bossActNoBtnEl) bossActNoBtnEl.textContent = S('bossActNo');
+            if (playerActionInputEl) playerActionInputEl.placeholder = S('playerActionPlaceholder');
+            if (submitActionBtnEl) submitActionBtnEl.textContent = S('submitAction');
+            if (openAbilitiesModalBtnEl) {
+                const player = gameState.players[gameState.currentPlayerIndex];
+                 if (player && player.abilities && player.abilities.length > 0 && player.abilities[0].name !== S('noAbility', {}, lang)) {
+                     openAbilitiesModalBtnEl.textContent = S('useAbilityButton');
+                } else {
+                     openAbilitiesModalBtnEl.textContent = S('useAbilityButton'); 
+                }
+            }
+            if (settingsBtnGame) settingsBtnGame.textContent = S('settings');
+            if (showInventoryBtnEl) showInventoryBtnEl.textContent = S('inventoryButton');
+            if (retryGMBtnEl) retryGMBtnEl.textContent = S('retryGMButton');
+            if (askGMModalBtnEl) askGMModalBtnEl.textContent = S('askGMButton');
+            if (saveGameStateBtnEl) saveGameStateBtnEl.textContent = S('saveCampaign');
+            if (mainMenuGSBtnEl) mainMenuGSBtnEl.textContent = S('returnToMainMenu');
+
+            // Modals
+            if (inventoryTitleModalEl) inventoryTitleModalEl.textContent = S('inventoryTitleModal');
+            if (itemsListTitleEl) itemsListTitleEl.textContent = S('itemsListTitle');
+            if (closeInventoryBtnEl) closeInventoryBtnEl.textContent = S('closeButton');
+            if (abilitiesTitleModalEl) abilitiesTitleModalEl.textContent = S('abilitiesModalTitle');
+            if (closeAbilitiesBtnEl) closeAbilitiesBtnEl.textContent = S('closeButton');
+            if (askGMTitleModalEl) askGMTitleModalEl.textContent = S('askGMModalTitle');
+            if (gmQuestionLabelEl) gmQuestionLabelEl.textContent = S('gmQuestionLabel');
+            if (gmQuestionInputEl) gmQuestionInputEl.placeholder = S('gmQuestionPlaceholder');
+            if (submitGMQuestionBtnEl) submitGMQuestionBtnEl.textContent = S('submitGMQuestion');
+            if (visualizeTitleModalEl) visualizeTitleModalEl.textContent = S('visualizeModalTitle');
+            if (closeVisualizeModalBtnEl) closeVisualizeModalBtnEl.textContent = S('visualizeModalClose');
+
+            // Settings Modal
+            if (settingsTitleModalEl) settingsTitleModalEl.textContent = S('settingsTitle');
+            if (volumeLabelEl) volumeLabelEl.textContent = S('volumeLabel');
+            if (themeSelectLabelEl) themeSelectLabelEl.textContent = S('themeSelectLabel');
+            if (themeSelectEl) {
+                themeSelectEl.options[0].textContent = S('themeClassicVoid');
+                themeSelectEl.options[1].textContent = S('themeCrimsonCult');
+                themeSelectEl.options[2].textContent = S('themeArcaneGreen');
+                themeSelectEl.options[3].textContent = S('themeMonoPixel');
+            }
+            if (aboutGameTitleEl) aboutGameTitleEl.textContent = S('aboutGameTitle');
+            if (aboutGameTextEl) aboutGameTextEl.textContent = S('aboutGameText');
+            if (closeSettingsBtnEl) closeSettingsBtnEl.textContent = S('closeButton');
+            if(agreeBtnEl) agreeBtnEl.textContent = S('agreeButton');
+
+
+            if (gameState.currentScreen === 'game-screen') {
+                updatePlayerTurnIndicator();
+                 if (gameState.storyLog.length === 1 && (gameState.storyLog[0].text === uiStrings.en.initialStory || gameState.storyLog[0].text === uiStrings.es.initialStory)) {
+                     gameState.storyLog[0].text = S('initialStory'); 
+                     updateStoryDisplay();
+                }
+            }
+            if (loadingOverlayTextEl) loadingOverlayTextEl.textContent = S('loadingMessage');
+        }
+
+        function showScreen(screenId) {
+            Object.values(screensElements).forEach(screen => { if(screen) screen.classList.remove('active-screen')});
+            if (screensElements[screenId]) {
+                screensElements[screenId].classList.add('active-screen');
+                gameState.currentScreen = screenId;
+            } else {
+                console.error("Screen not found:", screenId, "Defaulting to main menu.");
+                if(screensElements['main-menu-screen']) screensElements['main-menu-screen'].classList.add('active-screen');
+                gameState.currentScreen = 'main-menu-screen';
+            }
+            window.scrollTo(0,0); 
+            updateUITextForLanguage(); 
+        }
+
+        function showLoading(messageKey = "loadingMessage") {
+            if(loadingOverlayTextEl) loadingOverlayTextEl.textContent = S(messageKey);
+            if(loadingOverlayEl) loadingOverlayEl.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            if(loadingOverlayEl) loadingOverlayEl.style.display = 'none';
+        }
+
+        function updatePlayerDetailForms() {
+            if (!playerCountSelectEl || !playerDetailsContainerEl) return;
+            const count = parseInt(playerCountSelectEl.value) || 1;
+            playerDetailsContainerEl.innerHTML = ''; 
+            for (let i = 0; i < count; i++) {
+                const div = document.createElement('div');
+                div.className = 'p-4 border-2 border-[var(--secondary-accent)] bg-[var(--button-bg)] shadow-[2px_2px_0px_#0a0814]';
+                div.innerHTML = `
+                    <h3 class="text-xl font-semibold mb-3 text-[var(--title-color)]">${S('characterLabel')} ${i + 1}</h3>
+                    <label for="player-name-${i}" class="block mb-1">${S('nameLabel')}</label>
+                    <input type="text" id="player-name-${i}" class="w-full p-2" placeholder="${S('namePlaceholder')}">
+                    <label for="player-desc-${i}" class="block mt-3 mb-1">${S('descriptionLabel')}</label>
+                    <textarea id="player-desc-${i}" class="w-full p-2" placeholder="${S('descPlaceholder')}"></textarea>
+                    <div class="flex items-center mt-3 space-x-4">
+                        <div>
+                            <input type="checkbox" id="player-monster-${i}" class="player-type-checkbox">
+                            <label for="player-monster-${i}" class="text-sm">${S('playAsMonsterLabel')}</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="player-god-${i}" class="player-type-checkbox">
+                            <label for="player-god-${i}" class="text-sm">${S('playAsGodLabel')}</label>
+                        </div>
+                    </div>
+                    <div id="god-selection-area-${i}" class="mt-3 hidden">
+                        <label for="god-type-${i}" class="block mb-1 text-sm">${S('godSelectionLabel')}</label>
+                        <select id="god-type-${i}" class="w-full p-2">
+                            <option value="cthulhu">${S('godCthulhu')}</option>
+                            <option value="nyarlathotep">${S('godNyarlathotep')}</option>
+                            <option value="azathoth">${S('godAzathoth')}</option>
+                            <option value="custom">${S('godCustom')}</option>
+                        </select>
+                        <input type="text" id="custom-god-name-${i}" class="w-full p-2 mt-1 hidden" placeholder="Custom Entity Name...">
+                    </div>
+                `;
+                playerDetailsContainerEl.appendChild(div);
+                addPortraitGenerationToForm(div, i); 
+
+                const godCheckbox = div.querySelector(`#player-god-${i}`);
+                const godSelectionArea = div.querySelector(`#god-selection-area-${i}`);
+                const monsterCheckbox = div.querySelector(`#player-monster-${i}`);
+                const customGodNameInput = div.querySelector(`#custom-god-name-${i}`);
+                const godTypeSelect = div.querySelector(`#god-type-${i}`);
+
+                [godCheckbox, monsterCheckbox].forEach(checkbox => {
+                    if (checkbox) checkbox.addEventListener('change', (e) => {
+                        const currentCheckbox = e.target;
+                        if (currentCheckbox.checked) {
+                            if (currentCheckbox === godCheckbox && monsterCheckbox) monsterCheckbox.checked = false;
+                            if (currentCheckbox === monsterCheckbox && godCheckbox) godCheckbox.checked = false;
+                        }
+                        if (godSelectionArea) godSelectionArea.classList.toggle('hidden', !godCheckbox.checked);
+                        if (godCheckbox.checked && godTypeSelect.value === 'custom' && customGodNameInput) {
+                            customGodNameInput.classList.remove('hidden');
+                        } else if (customGodNameInput) {
+                             customGodNameInput.classList.add('hidden');
+                        }
+                    });
+                });
+
+                if(godTypeSelect) godTypeSelect.addEventListener('change', (e) => {
+                    if(customGodNameInput) customGodNameInput.classList.toggle('hidden', e.target.value !== 'custom');
+                });
+            }
+        }
+
+        function addPortraitGenerationToForm(formDiv, playerIndex) {
+            const portraitButton = document.createElement('button');
+            portraitButton.id = `generate-portrait-btn-${playerIndex}`;
+            portraitButton.textContent = S('pixelArtPortraitButton');
+            portraitButton.className = "w-full py-1 mt-2 text-sm bg-fuchsia-700 hover:bg-fuchsia-800";
+            portraitButton.type = "button"; 
+
+            const portraitPreview = document.createElement('img');
+            portraitPreview.id = `portrait-preview-${playerIndex}`;
+            portraitPreview.className = "character-portrait mt-2 mx-auto hidden"; 
+            portraitPreview.src = DEFAULT_PORTRAIT_URL; 
+            portraitPreview.alt = "Character Portrait Preview";
+            portraitPreview.onerror = function() { this.src = 'https://placehold.co/64x64/181028/302050?text=Error&txtsize=10'; };
+
+
+            formDiv.appendChild(portraitPreview); 
+            formDiv.appendChild(portraitButton);
+
+            portraitButton.addEventListener('click', async () => {
+                const nameInput = document.getElementById(`player-name-${playerIndex}`);
+                const descInput = document.getElementById(`player-desc-${playerIndex}`);
+                const name = nameInput ? nameInput.value.trim() : "Unnamed Character";
+                const description = descInput ? descInput.value.trim() : "A mysterious figure";
+
+                portraitButton.disabled = true;
+                portraitButton.textContent = "Generating...";
+                portraitPreview.classList.remove('hidden'); 
+                portraitPreview.src = "https://placehold.co/64x64/181028/302050?text=Load&txtsize=10"; 
+
+                let tempPlayerIsGod = false;
+                let tempPlayerIsMonster = false;
+                let tempPlayerGodType = '';
+
+                const godCheckbox = document.getElementById(`player-god-${playerIndex}`);
+                const monsterCheckbox = document.getElementById(`player-monster-${playerIndex}`);
+
+                if (godCheckbox && godCheckbox.checked) {
+                    tempPlayerIsGod = true;
+                    const godTypeSelect = document.getElementById(`god-type-${playerIndex}`);
+                    tempPlayerGodType = godTypeSelect ? godTypeSelect.value : 'cthulhu';
+                    if (tempPlayerGodType === 'custom') {
+                        const customGodNameInput = document.getElementById(`custom-god-name-${playerIndex}`);
+                        tempPlayerGodType = customGodNameInput ? customGodNameInput.value.trim() || 'Custom Entity' : 'Custom Entity';
+                    }
+                } else if (monsterCheckbox && monsterCheckbox.checked) {
+                    tempPlayerIsMonster = true;
+                }
+
+                let playerTypeForPrompt = "character";
+                if (tempPlayerIsGod) playerTypeForPrompt = `Eldritch Entity named ${tempPlayerGodType || 'a forgotten one'}`;
+                else if (tempPlayerIsMonster) playerTypeForPrompt = "creature";
+
+                let portraitPrompt = `Pixel art portrait of a ${playerTypeForPrompt} named "${name}", described as "${description}". ${gameState.selectedGameMode} setting. 16-bit retro RPG style, simple dark background, character centered, head and shoulders.`;
+
+                try {
+                    const imageUrl = await callImagenAPI(portraitPrompt);
+                    portraitPreview.src = imageUrl;
+                } catch (error) {
+                    console.error("Error generating portrait:", error);
+                    portraitPreview.src = DEFAULT_PORTRAIT_URL; 
+                } finally {
+                    portraitButton.disabled = false;
+                    portraitButton.textContent = S('pixelArtPortraitButton');
+                }
+            });
+        }
+
+        function parseAndAssignItemsAndAbilities(player, aiResponse) {
+            const itemMatch = aiResponse.match(/ITEM:\s*(.*?)(?:\.\s*|\s*\nABILITIES|\s*\nHABILIDADES|\s*$)/i) ||
+                              aiResponse.match(/OBJETO:\s*(.*?)(?:\.\s*|\s*\nABILITIES|\s*\nHABILIDADES|\s*$)/i);
+            
+            player.inventory = [];
+            player.abilities = [];
+
+            if (!player.isMonster && !player.isGod) {
+                if (itemMatch && itemMatch[1] && itemMatch[1].trim().toLowerCase() !== 'none' && itemMatch[1].trim().toLowerCase() !== 'ninguno') {
+                    player.inventory.push(itemMatch[1].trim());
+                } else {
+                    player.inventory.push(S('defaultPocketWatch')); 
+                }
+            }
+            
+            const abilitiesRegex = /(\d+)\.\s*(.*?)\s*-\s*(.*?)\s*-\s*COST(?:O)?:\s*(\d+)/gi;
+            let abilityMatch;
+            while ((abilityMatch = abilitiesRegex.exec(aiResponse)) !== null && player.abilities.length < 5) {
+                player.abilities.push({
+                    name: abilityMatch[2].trim(),
+                    desc: abilityMatch[3].trim(),
+                    cost: parseInt(abilityMatch[4].trim()) || 0
+                });
+            }
+
+            while (player.abilities.length < 5) {
+                player.abilities.push({
+                    name: `${S('defaultAbilityName')} ${player.abilities.length + 1}`,
+                    desc: S('defaultAbilityDesc'),
+                    cost: parseInt(S('defaultAbilityCost')) || 0
+                });
+            }
+        }
+
+        function initializeGameScreen() {
+            gameState.currentPlayerIndex = 0;
+            gameState.turnActions = [];
+            gameState.isAwaitingPlayerAction = true;
+            if (gameState.storyLog.length === 0 || (gameState.storyLog.length === 1 && (gameState.storyLog[0].text === S('initialStory') || gameState.storyLog[0].text === uiStrings.en.initialStory || gameState.storyLog[0].text === uiStrings.es.initialStory) )) {
+                 gameState.storyLog = [{ speaker: 'GM', text: S('initialStory') }];
+            }
+            updateStoryDisplay();
+            updatePlayerTurnIndicator();
+            if(playerActionInputEl) playerActionInputEl.value = '';
+            if(playerActionInputEl) playerActionInputEl.disabled = false;
+            if(submitActionBtnEl) submitActionBtnEl.disabled = false;
+            if(visualizeTitleModalEl) visualizeTitleModalEl.textContent = S('visualizeModalTitle');
+            if(visualizeHintTextEl) visualizeHintTextEl.textContent = S('visualizeModalHintDefault');
+            if(visualizeImageEl) {
+                visualizeImageEl.src = DEFAULT_VISUAL_URL;
+                visualizeImageEl.alt = S('imageAltInitial');
+            }
+        }
+
+        function updateStoryDisplay() {
+            if (!storyDisplayEl) return;
+            storyDisplayEl.innerHTML = gameState.storyLog.map(entry => {
+                let speakerName = entry.speaker;
+                let textClass = "";
+                if (entry.speaker !== 'GM' && entry.speaker !== 'GM_EFFECT' && entry.speaker !== 'HINT') {
+                    const player = gameState.players.find(p => p.name === entry.speaker);
+                    speakerName = player ? player.name : entry.speaker;
+                    if (player && player.isGod) speakerName = `${speakerName} (${S('godLabel')}: ${player.godType})`;
+                    else if (player && player.isMonster) speakerName = `${speakerName} (${S('monsterLabel')})`;
+                } else if (entry.speaker === 'GM_EFFECT') {
+                    textClass = "italic text-yellow-300";
+                } else if (entry.speaker === 'HINT') {
+                    textClass = "italic text-cyan-300";
+                    speakerName = S('visionHintPrefix').trim();
+                }
+                const sanitizedSpeaker = String(speakerName).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const sanitizedText = String(entry.text).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                return `<p class="mb-2 ${textClass}"><strong class="text-[var(--title-color)]">${sanitizedSpeaker}:</strong> ${sanitizedText}</p>`;
+            }).join('');
+            storyDisplayEl.scrollTop = storyDisplayEl.scrollHeight; 
+        }
+
+
+        function updatePlayerTurnIndicator() {
+            if (!currentPlayerTurnIndicatorEl) return;
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            if(bossActionChoiceAreaEl) bossActionChoiceAreaEl.classList.add('hidden');
+            if(playerInputAreaEl) playerInputAreaEl.classList.remove('hidden');
+
+            if (gameState.isGMProcessing) {
+                if(currentPlayerTurnIndicatorEl) currentPlayerTurnIndicatorEl.textContent = S('gmPonders');
+                if(playerActionInputEl) playerActionInputEl.disabled = true;
+                if(submitActionBtnEl) submitActionBtnEl.disabled = true;
+                if(openAbilitiesModalBtnEl) openAbilitiesModalBtnEl.disabled = true;
+            } else if (gameState.isAwaitingPlayerAction && gameState.players.length > 0 && currentPlayer) {
+                if(currentPlayerTurnIndicatorEl) currentPlayerTurnIndicatorEl.textContent = S('awaitingActionFrom', {PLAYER_NAME: currentPlayer.name});
+
+                if (currentPlayer.isGod) {
+                    if(playerInputAreaEl) playerInputAreaEl.classList.add('hidden');
+                    if(bossActionChoiceAreaEl) bossActionChoiceAreaEl.classList.remove('hidden');
+                    if(bossPromptTextEl) bossPromptTextEl.textContent = S('bossActionPrompt', {BOSS_NAME: currentPlayer.name});
+                } else {
+                    if(playerInputAreaEl) playerInputAreaEl.classList.remove('hidden');
+                    if(bossActionChoiceAreaEl) bossActionChoiceAreaEl.classList.add('hidden');
+                    if(playerActionInputEl) playerActionInputEl.disabled = false;
+                    if(submitActionBtnEl) submitActionBtnEl.disabled = false;
+                    if(openAbilitiesModalBtnEl) openAbilitiesModalBtnEl.disabled = !(currentPlayer.abilities && currentPlayer.abilities.length > 0 && currentPlayer.abilities[0].name !== S('noAbility'));
+                    if(playerActionInputEl) playerActionInputEl.focus();
+                }
+            } else if (gameState.players.length === 0 && gameState.currentScreen === 'game-screen') {
+                 if(currentPlayerTurnIndicatorEl) currentPlayerTurnIndicatorEl.textContent = S('noInvestigators');
+                 if(playerActionInputEl) playerActionInputEl.disabled = true;
+                 if(submitActionBtnEl) submitActionBtnEl.disabled = true;
+                 if(openAbilitiesModalBtnEl) openAbilitiesModalBtnEl.disabled = true;
+            } else {
+                 if(currentPlayerTurnIndicatorEl) currentPlayerTurnIndicatorEl.textContent = gameState.players.length > 0 ? S('allActionsReceived') : S('errorCurrentPlayer');
+                 if(playerActionInputEl) playerActionInputEl.disabled = true;
+                 if(submitActionBtnEl) submitActionBtnEl.disabled = true;
+                 if(openAbilitiesModalBtnEl) openAbilitiesModalBtnEl.disabled = true;
+            }
+        }
+
+        async function handlePlayerAction(actionType, itemDetails = {}) {
+            if (gameState.isGMProcessing || !gameState.isAwaitingPlayerAction || gameState.players.length === 0) return;
+
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            if (!currentPlayer) {
+                console.error("Current player not found in handlePlayerAction");
+                return;
+            }
+            let actionText = "";
+
+            switch(actionType) {
+                case 'ability':
+                    if (itemDetails.abilityIndex < 0 || itemDetails.abilityIndex >= currentPlayer.abilities.length) return;
+                    const ability = currentPlayer.abilities[itemDetails.abilityIndex];
+                    if (!ability || ability.name === S('noAbility')) return;
+                    if (currentPlayer.sanity < ability.cost && !currentPlayer.isGod) {
+                        console.warn(`${currentPlayer.name} has insufficient sanity for ${ability.name}`);
+                        return;
+                    }
+                    if(!currentPlayer.isGod) currentPlayer.sanity -= ability.cost;
+                    actionText = `uses ability: ${ability.name} - ${ability.desc}`;
+                    gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('abilityUsedEffect', {PLAYER_NAME: currentPlayer.name, ABILITY_NAME: ability.name, COST: ability.cost }) });
+                    if(abilitiesModalEl) abilitiesModalEl.classList.remove('active-modal');
+                    break;
+                case 'use_item':
+                    if (!itemDetails.item || itemDetails.itemIndex < 0 || itemDetails.itemIndex >= currentPlayer.inventory.length) return;
+                    const itemToUse = currentPlayer.inventory[itemDetails.itemIndex];
+                    actionText = `uses item: ${itemToUse}`;
+                    gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('itemUsedEffect', {PLAYER_NAME: currentPlayer.name, ITEM_NAME: itemToUse}) });
+                    currentPlayer.inventory.splice(itemDetails.itemIndex, 1); 
+                    if(inventoryModalEl) inventoryModalEl.classList.remove('active-modal');
+                    break;
+                case 'give_item':
+                    if (!itemDetails.item || itemDetails.itemIndex < 0 || itemDetails.itemIndex >= currentPlayer.inventory.length || !itemDetails.targetPlayerName) return;
+                    const itemToGive = currentPlayer.inventory[itemDetails.itemIndex];
+                    actionText = `attempts to give ${itemToGive} to ${itemDetails.targetPlayerName}`;
+                    gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('itemGiveAttemptEffect', {PLAYER_NAME: currentPlayer.name, ITEM_NAME: itemToGive, TARGET_NAME: itemDetails.targetPlayerName}) });
+                    if(inventoryModalEl) inventoryModalEl.classList.remove('active-modal');
+                    break;
+                case 'text_action':
+                    if (!playerActionInputEl) return;
+                    actionText = playerActionInputEl.value.trim();
+                    if (!actionText) {
+                        console.warn("Player action submitted empty.");
+                        return;
+                    }
+                    break;
+                default:
+                    console.error("Unknown action type:", actionType);
+                    return;
+            }
+
+            currentPlayer.action = actionText;
+            gameState.storyLog.push({ speaker: currentPlayer.name, text: actionText });
+            updateStoryDisplay();
+            if(playerActionInputEl) playerActionInputEl.value = ''; 
+
+            const isLastPlayer = gameState.currentPlayerIndex >= gameState.players.length - 1;
+
+            if (isLastPlayer || gameState.players.length === 1 || currentPlayer.isGod) {
+                gameState.isAwaitingPlayerAction = false;
+                await processTurn();
+            } else {
+                gameState.currentPlayerIndex++;
+            }
+            updatePlayerTurnIndicator();
+        }
+
+
+        async function processTurn() {
+            gameState.isGMProcessing = true;
+            updatePlayerTurnIndicator();
+            showLoading("gmWeavesNarrative");
+
+            let turnSummary = "The characters' actions this turn:\n";
+            gameState.players.forEach(player => {
+                if(player.action) {
+                    let playerType = S('characterLabel');
+                    if(player.isGod) playerType = `${S('godLabel')}: ${player.godType}`;
+                    else if(player.isMonster) playerType = S('monsterLabel');
+                    turnSummary += `${player.name} (${playerType}, HP: ${player.hp}, Sanity: ${player.sanity}): ${player.action}\n`;
+                    player.history.push(S('actionHistory', {ACTION: player.action}));
+                }
+            });
+            const actingPlayers = gameState.players.filter(p => p.action);
+            if (actingPlayers.length === 1) {
+                const actingPlayer = actingPlayers[0];
+                let playerType = S('characterLabel');
+                if(actingPlayer.isGod) playerType = `${S('godLabel')}: ${actingPlayer.godType}`;
+                else if(actingPlayer.isMonster) playerType = S('monsterLabel');
+                turnSummary = `${actingPlayer.name} (${playerType}, HP: ${actingPlayer.hp}, Sanity: ${actingPlayer.sanity}) took action: ${actingPlayer.action}\n`;
+            }
+            gameState.lastPlayerActions = gameState.players.map(p => p.action || "");
+
+
+            let gameModeSpecificPreamble = "";
+             if (gameState.partyName && gameState.partyName !== S('partyNamePlaceholder') && gameState.partyName.trim() !== "") {
+                 gameModeSpecificPreamble += `The player characters are part of a group known as "${gameState.partyName}". `;
+            }
+
+            let systemPromptInstructionKey = 'gmSystemPromptInstruction_Base';
+            if (gameState.selectedGameMode === 'custom' && gameState.customGameModePrompt) {
+                gameModeSpecificPreamble += `This is a custom visual novel based on the theme: "${gameState.customGameModePrompt}". `;
+            } else if (gameState.selectedGameMode === 'dnd') {
+                systemPromptInstructionKey = 'gmSystemPromptInstruction_DnD'; 
+                gameModeSpecificPreamble += `This is a D&D style fantasy adventure. You are the Dungeon Master. `;
+            } else { 
+                gameModeSpecificPreamble += `This is a Lovecraftian horror visual novel. `;
+            }
+
+
+            let gmSystemPrompt = `You are the Game Master. ${gameModeSpecificPreamble}${S(systemPromptInstructionKey)}
+Current Scenario: ${gameState.currentScenario}
+Player States:
+${gameState.players.map(p => {
+    let playerType = S('characterLabel');
+    if(p.isGod) playerType = `${S('godLabel')}: ${p.godType}`;
+    else if(p.isMonster) playerType = S('monsterLabel');
+    return `- ${p.name} (${playerType}): HP ${p.hp}/${p.maxHp}, Sanity ${p.sanity}, Inventory [${p.inventory.join(', ')}], Abilities [${p.abilities.map(ab => `${ab.name} (Cost ${ab.cost})`).join('; ')}]`
+}).join('\n')}
+Recent events (last 3-5 from story log for context):
+${gameState.storyLog.slice(-5).map(entry => `${entry.speaker}: ${entry.text}`).join('\n')}
+The player(s) took the following action(s) this round:
+${turnSummary}
+Respond in ${gameState.currentLanguage === 'es' ? 'Español' : 'English'}.
+`;
+            gameState.gmPromptHistory.push({ role: "user", parts: [{ text: gmSystemPrompt }] });
+            const maxHistoryItems = 10; 
+            if (gameState.gmPromptHistory.length > maxHistoryItems) {
+                const systemPrompts = gameState.gmPromptHistory.filter(item => item.parts && item.parts[0] && item.parts[0].text.startsWith("You are the Game Master.") || item.parts[0].text.startsWith("You are the Dungeon Master."));
+                const lastSystemPrompt = systemPrompts.pop() || gameState.gmPromptHistory[0]; 
+                const recentInteractions = gameState.gmPromptHistory.slice(-(maxHistoryItems -1));
+                gameState.gmPromptHistory = [lastSystemPrompt, ...recentInteractions.filter(item => item !== lastSystemPrompt)]; 
+            }
+
+
+            try {
+                const gmResponse = await callGeminiAPI(gmSystemPrompt, gameState.gmPromptHistory.slice(0, -1)); 
+                gameState.gmPromptHistory.push({ role: "model", parts: [{ text: gmResponse }] }); 
+
+                parseGMResponse(gmResponse); 
+                const narrativePart = gmResponse.split(/\[SANITY_CHANGE:|\[ITEM_FOUND:|\[ITEM_LOST:|\[DAMAGE:|\[ABILITY_UPDATE:|\[MUSIC_SWITCH:|\[ITEM_TRANSFER:|\[ITEM_GIVE_FAIL:/)[0].trim();
+                if (narrativePart) {
+                    gameState.storyLog.push({ speaker: 'GM', text: narrativePart });
+                }
+                gameState.currentScenario = narrativePart || gmResponse; 
+
+            } catch (error) {
+                console.error("Error getting GM response:", error);
+                gameState.storyLog.push({ speaker: 'GM', text: S('gmErrorGeneric') });
+            }
+
+            gameState.players.forEach(p => p.action = ""); 
+            gameState.currentPlayerIndex = 0;
+            gameState.isAwaitingPlayerAction = true;
+            gameState.isGMProcessing = false;
+
+            hideLoading();
+            updateStoryDisplay();
+            updatePlayerTurnIndicator();
+        }
+
+        async function retryGMAction() {
+            if (gameState.isGMProcessing) return;
+            if (gameState.lastPlayerActions.length === 0 || gameState.lastPlayerActions.every(action => action === "")) {
+                console.warn("No previous actions to retry or all were empty.");
+                const noRetryMsg = document.createElement('p');
+                noRetryMsg.textContent = "No significant prior actions to retry.";
+                noRetryMsg.className = "text-yellow-400 text-center my-1 text-sm fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-[5000]";
+                document.body.appendChild(noRetryMsg);
+                setTimeout(() => noRetryMsg.remove(), 3000);
+                return;
+            }
+            console.log("Retrying GM response with last actions.");
+            gameState.players.forEach((player, index) => {
+                player.action = gameState.lastPlayerActions[index] || ""; 
+            });
+            gameState.isAwaitingPlayerAction = false; 
+            await processTurn(); 
+        }
+
+        function parseGMResponse(responseText) {
+            const sanityRegex = /\[SANITY_CHANGE:\s*(.*?),\s*([+-]?\d+),\s*(.*?)\]/gi;
+            let match;
+            while ((match = sanityRegex.exec(responseText)) !== null) {
+                const playerName = match[1].trim();
+                const change = parseInt(match[2]);
+                const reason = match[3].trim();
+                const player = gameState.players.find(p => p.name === playerName);
+                if (player && !player.isGod) { 
+                    player.sanity += change;
+                    if (player.sanity < 0) player.sanity = 0;
+                    if (player.sanity > 100 && !player.isGod) player.sanity = 100; 
+                    gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('sanityChangeEffect', {PLAYER_NAME: player.name, CHANGE: change, REASON: reason, SANITY: player.sanity})});
+                    player.history.push(S('sanityHistory', {CHANGE: change, SANITY: player.sanity, REASON: reason}));
+                }
+            }
+
+            const damageRegex = /\[DAMAGE:\s*(.*?),\s*(\d+),\s*(.*?)\]/gi;
+            while ((match = damageRegex.exec(responseText)) !== null) {
+                const playerName = match[1].trim();
+                const amount = parseInt(match[2]);
+                const reason = match[3].trim();
+                const player = gameState.players.find(p => p.name === playerName);
+                if (player) {
+                    player.hp -= amount;
+                    if (player.hp < 0) player.hp = 0;
+                    gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('damageEffect', {PLAYER_NAME: player.name, DAMAGE: amount, REASON: reason, HP: player.hp})});
+                    player.history.push(`Took ${amount} damage from ${reason}. HP: ${player.hp}`);
+                    if (player.hp === 0) {
+                        gameState.storyLog.push({ speaker: 'GM_EFFECT', text: `${player.name} has been defeated!`});
+                    }
+                }
+            }
+
+            const itemFoundRegex = /\[ITEM_FOUND:\s*(.*?),\s*(.*?)\]/gi;
+            while ((match = itemFoundRegex.exec(responseText)) !== null) {
+                const playerName = match[1].trim();
+                const itemName = match[2].trim();
+                const player = gameState.players.find(p => p.name === playerName);
+                if (player && !player.isMonster && !player.isGod && itemName.toLowerCase() !== 'none' && itemName.toLowerCase() !== 'ninguno' && itemName.trim() !== '') { 
+                    player.inventory.push(itemName);
+                    gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('itemFoundEffect', {PLAYER_NAME: player.name, ITEM_NAME: itemName})});
+                    player.history.push(S('foundHistory', {ITEM_NAME: itemName}));
+                }
+            }
+
+            const itemLostRegex = /\[ITEM_LOST:\s*(.*?),\s*(.*?)\]/gi;
+            while ((match = itemLostRegex.exec(responseText)) !== null) {
+                const playerName = match[1].trim();
+                const itemName = match[2].trim();
+                const player = gameState.players.find(p => p.name === playerName);
+                if (player && !player.isMonster && !player.isGod && itemName.trim() !== '') {
+                    const itemIndex = player.inventory.findIndex(invItem => invItem.toLowerCase() === itemName.toLowerCase());
+                    if (itemIndex > -1) {
+                        player.inventory.splice(itemIndex, 1);
+                        gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('itemLostEffect', {PLAYER_NAME: player.name, ITEM_NAME: itemName})});
+                        player.history.push(S('lostHistory', {ITEM_NAME: itemName}));
+                    }
+                }
+            }
+            
+            const itemTransferRegex = /\[ITEM_TRANSFER:\s*(.*?),\s*(.*?),\s*(.*?),\s*(.*?)\]/gi;
+            while ((match = itemTransferRegex.exec(responseText)) !== null) {
+                const giverName = match[1].trim();
+                const receiverName = match[2].trim();
+                const itemName = match[3].trim();
+                const reason = match[4].trim();
+                const giver = gameState.players.find(p => p.name === giverName);
+                const receiver = gameState.players.find(p => p.name === receiverName);
+
+                if (giver && receiver && itemName.trim() !== '') {
+                    const itemIndex = giver.inventory.findIndex(invItem => invItem.toLowerCase() === itemName.toLowerCase());
+                    if (itemIndex > -1) {
+                        giver.inventory.splice(itemIndex, 1);
+                        receiver.inventory.push(itemName);
+                        gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('itemGiveSuccessEffect', {GIVER_NAME: giverName, RECEIVER_NAME: receiverName, ITEM_NAME: itemName}) + ` (${reason})`});
+                        giver.history.push(`Gave ${itemName} to ${receiverName}.`);
+                        receiver.history.push(`Received ${itemName} from ${giverName}.`);
+                    } else {
+                         gameState.storyLog.push({ speaker: 'GM_EFFECT', text: `GM tried to transfer ${itemName} from ${giverName}, but they didn't have it.`});
+                    }
+                }
+            }
+
+            const itemGiveFailRegex = /\[ITEM_GIVE_FAIL:\s*(.*?),\s*(.*?),\s*(.*?),\s*(.*?)\]/gi;
+            while ((match = itemGiveFailRegex.exec(responseText)) !== null) {
+                const giverName = match[1].trim();
+                const receiverName = match[2].trim();
+                const itemName = match[3].trim();
+                const reason = match[4].trim();
+                gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('itemGiveFailEffect', {GIVER_NAME: giverName, RECEIVER_NAME: receiverName, ITEM_NAME: itemName, REASON: reason}) });
+            }
+
+
+            const musicSwitchRegex = /\[MUSIC_SWITCH:\s*(ambient|combat)\]/i;
+            match = musicSwitchRegex.exec(responseText);
+            if (match && match[1]) {
+                const trackType = match[1].toLowerCase();
+                if (trackType === 'ambient' || trackType === 'combat') {
+                    playMusic(trackType);
+                }
+            }
+        }
+
+        async function callGeminiAPI(prompt, history = []) {
+            console.log("Calling Gemini API. Prompt (first 200 chars):", prompt.substring(0, 200) + "...");
+            console.log("History length for Gemini call:", history.length);
+            const payload = {
+                contents: [...history, { role: "user", parts: [{ text: prompt }] }],
+                generationConfig: { maxOutputTokens: 1024, temperature: 0.7 } 
+            };
+
+            try {
+                const response = await fetch(geminiApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorBody = await response.text(); 
+                    console.error(`Gemini API request failed with status ${response.status}:`, errorBody);
+                    throw new Error(`API request failed with status ${response.status}: ${errorBody}`);
+                }
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else if (result.promptFeedback && result.promptFeedback.blockReason) {
+                     console.error(`Gemini content blocked: ${result.promptFeedback.blockReason} - ${result.promptFeedback.blockReasonMessage || 'No specific message.'}`);
+                     throw new Error(`Content blocked by API: ${result.promptFeedback.blockReason} - ${result.promptFeedback.blockReasonMessage || 'No specific message.'}`);
+                }
+                else {
+                    console.warn("Unexpected Gemini API response structure:", result);
+                    return "The ether crackles with an indecipherable message...";
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API (raw):', error);
+                if (error instanceof Error) { 
+                    console.error('Error name:', error.name);
+                    console.error('Error message:', error.message);
+                }
+                return `Error from the beyond (Gemini): ${error.message || 'Unknown error'}. Check console for details. Try a different phrasing or action.`;
+            }
+        }
+
+        async function callImagenAPI(prompt) {
+            console.log("Calling Imagen API. Prompt (first 100 chars):", prompt.substring(0,100) + "...");
+            const payload = { instances: [{ prompt: prompt }], parameters: { "sampleCount": 1 } };
+            try {
+                const response = await fetch(imagenApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error(`Imagen API request failed with status ${response.status}:`, errorBody);
+                    throw new Error(`Imagen API request failed with status ${response.status}: ${errorBody}`);
+                }
+                const result = await response.json();
+                if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                    return `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                } else {
+                    console.warn("No image data received from Imagen API or unexpected response structure:", result);
+                    throw new Error("No image data received from Imagen API or unexpected response structure.");
+                }
+            } catch (error) {
+                console.error('Error calling Imagen API (raw):', error);
+                if (error instanceof Error) {
+                    console.error('Error name:', error.name);
+                    console.error('Error message:', error.message);
+                }
+                throw error; 
+            }
+        }
+
+        function toggleInventoryModal() {
+            if (!inventoryModalEl || !inventoryCharacterCardAreaEl || !inventoryItemsListContainerEl) return;
+
+            if (inventoryModalEl.classList.contains('active-modal')) {
+                inventoryModalEl.classList.remove('active-modal');
+            } else {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                inventoryCharacterCardAreaEl.innerHTML = ''; 
+                inventoryItemsListContainerEl.innerHTML = ''; 
+
+                if (!currentPlayer) {
+                    inventoryCharacterCardAreaEl.innerHTML = `<p class="text-gray-400 italic">${S('noInvestigatorsInInventory')}</p>`;
+                    inventoryModalEl.classList.add('active-modal');
+                    return;
+                }
+
+                const card = document.createElement('div');
+                card.className = `character-card p-2 rounded-lg shadow flex items-center current-player-highlight`; 
+                let roleTag = '';
+                let nameColor = 'text-teal-300';
+                if (currentPlayer.isGod) {
+                    roleTag = ` (${S('godLabel')}: ${currentPlayer.godType})`;
+                    nameColor = 'text-yellow-400';
+                } else if (currentPlayer.isMonster) {
+                    roleTag = ` (${S('monsterLabel')})`;
+                    nameColor = 'text-red-400';
+                }
+                const portraitSrc = (currentPlayer.portraitUrl && (currentPlayer.portraitUrl.startsWith('data:image') || currentPlayer.portraitUrl.startsWith('http') || currentPlayer.portraitUrl.startsWith('./assets/'))) ?
+                                    currentPlayer.portraitUrl : DEFAULT_PORTRAIT_URL;
+
+                card.innerHTML = `
+                    <img src="${portraitSrc}" alt="${currentPlayer.name} Portrait" class="character-portrait" onerror="this.onerror=null; this.src='https://placehold.co/64x64/181028/302050?text=InvPrt&txtsize=10';">
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-lg ${nameColor}">${currentPlayer.name}${roleTag}</h4>
+                        <p class="text-sm">HP: <span class="font-semibold">${currentPlayer.hp}/${currentPlayer.maxHp}</span> | Sanity: <span class="font-semibold">${currentPlayer.sanity}</span></p>
+                    </div>
+                `;
+                inventoryCharacterCardAreaEl.appendChild(card);
+
+                if (currentPlayer.inventory.length > 0) {
+                    currentPlayer.inventory.forEach((item, itemIndex) => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'inventory-item-display flex justify-between items-center py-1';
+                        
+                        const itemNameEl = document.createElement('span');
+                        itemNameEl.textContent = item;
+                        itemNameEl.className = 'text-base';
+
+                        const actionsDiv = document.createElement('div');
+                        actionsDiv.className = 'inventory-item-actions flex items-center space-x-1';
+
+                        const useButton = document.createElement('button');
+                        useButton.textContent = S('useItemButton');
+                        useButton.className = 'py-1 px-2 text-xs';
+                        useButton.onclick = () => handlePlayerAction('use_item', { item: item, itemIndex: itemIndex });
+                        
+                        const giveButton = document.createElement('button');
+                        giveButton.textContent = S('giveItemButton');
+                        giveButton.className = 'py-1 px-2 text-xs';
+                        
+                        const giveToSelect = document.createElement('select');
+                        giveToSelect.className = 'py-1 px-1 text-xs ml-1';
+                        
+                        let hasOtherPlayers = false;
+                        gameState.players.forEach((p, pIndex) => {
+                            if (pIndex !== gameState.currentPlayerIndex) {
+                                const option = document.createElement('option');
+                                option.value = p.name;
+                                option.textContent = p.name;
+                                giveToSelect.appendChild(option);
+                                hasOtherPlayers = true;
+                            }
+                        });
+
+                        if (hasOtherPlayers) {
+                            giveButton.onclick = () => {
+                                if (giveToSelect.value) {
+                                    handlePlayerAction('give_item', { item: item, itemIndex: itemIndex, targetPlayerName: giveToSelect.value });
+                                }
+                            };
+                        } else {
+                            giveButton.disabled = true;
+                            giveToSelect.disabled = true;
+                            const noTargetOption = document.createElement('option');
+                            noTargetOption.textContent = "No targets";
+                            giveToSelect.appendChild(noTargetOption);
+                        }
+
+                        actionsDiv.appendChild(useButton);
+                        actionsDiv.appendChild(giveButton);
+                        actionsDiv.appendChild(giveToSelect);
+                        
+                        itemDiv.appendChild(itemNameEl);
+                        itemDiv.appendChild(actionsDiv);
+                        inventoryItemsListContainerEl.appendChild(itemDiv);
+                    });
+                } else {
+                    inventoryItemsListContainerEl.innerHTML = `<p class="text-sm italic text-gray-400">${S('nothingOfNote')}</p>`;
+                }
+                inventoryModalEl.classList.add('active-modal');
+            }
+        }
+
+
+        function populateAbilitiesModal(player) {
+            if (!abilitiesContentEl || !abilitiesModalEl) return;
+            abilitiesContentEl.innerHTML = ''; 
+            if (!player || !player.abilities || player.abilities.length === 0 || player.abilities[0].name === S('noAbility')) {
+                abilitiesContentEl.innerHTML = `<p class="text-gray-400 italic">${S('noAbility')}</p>`;
+                abilitiesModalEl.classList.add('active-modal');
+                return;
+            }
+
+            player.abilities.forEach((ability, index) => {
+                if (ability.name === S('noAbility')) return; 
+                const abilityDiv = document.createElement('div');
+                abilityDiv.className = 'ability-item flex justify-between items-center';
+                const canAfford = player.isGod || player.sanity >= ability.cost;
+                abilityDiv.innerHTML = `
+                    <div>
+                        <h5 class="font-semibold text-purple-300">${ability.name}</h5>
+                        <p class="text-xs text-gray-400">${ability.desc}</p>
+                        <p class="text-xs ${player.isGod ? 'text-yellow-400' : (canAfford ? 'text-green-400' : 'text-red-400')}">Cost: ${player.isGod ? 'N/A' : `${ability.cost} Sanity`}</p>
+                    </div>
+                    <button data-ability-index="${index}" 
+                            class="use-ability-from-modal-btn py-1 px-3 text-xs bg-yellow-600 hover:bg-yellow-700 rounded-md text-gray-900" 
+                            ${!canAfford ? 'disabled title="' + S('insufficientSanity') + '"' : ''}>
+                        ${S('useAbilityAction')}
+                    </button>
+                `;
+                abilitiesContentEl.appendChild(abilityDiv);
+            });
+
+            abilitiesModalEl.querySelectorAll('.use-ability-from-modal-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const abilityIndex = parseInt(e.target.dataset.abilityIndex);
+                    handlePlayerAction('ability', { abilityIndex: abilityIndex });
+                });
+            });
+            abilitiesModalEl.classList.add('active-modal');
+        }
+
+        function resetGameState() {
+             const currentLang = gameState.currentLanguage;
+             const currentTheme = gameState.currentTheme;
+             const currentVolume = gameState.volumeLevel;
+             disposeMusic(); 
+
+            gameState = {
+                currentScreen: 'main-menu-screen',
+                players: [], currentPlayerIndex: 0, turnActions: [],
+                storyLog: [{ speaker: 'GM', text: S('initialStory') }], 
+                currentScenario: "", gmPromptHistory: [],
+                isAwaitingPlayerAction: true, isGMProcessing: false,
+                currentLanguage: currentLang, 
+                supportedLanguages: ['en', 'es'],
+                selectedGameMode: 'lovecraftian', 
+                customGameModePrompt: '', partyName: '',
+                lastPlayerActions: [],
+                currentMusicTrack: 'ambient', 
+                volumeLevel: currentVolume, 
+                currentTheme: currentTheme, 
+            };
+            if(storyDisplayEl) storyDisplayEl.innerHTML = gameState.storyLog[0].text;
+            if(playerActionInputEl) playerActionInputEl.value = '';
+            if(visualizeImageEl) {
+                visualizeImageEl.src = DEFAULT_VISUAL_URL;
+                visualizeImageEl.alt = S('imageAltInitial');
+            }
+            if(visualizeHintTextEl) visualizeHintTextEl.textContent = S('visualizeModalHintDefault');
+            applyTheme(gameState.currentTheme); 
+            if (volumeSliderEl) volumeSliderEl.value = gameState.volumeLevel * 100; 
+            applyVolume(); 
+        }
+
+        function applyTheme(themeName) {
+            document.body.className = ''; 
+            document.body.classList.add(themeName); 
+            gameState.currentTheme = themeName;
+
+            const themes = {
+                'theme-classic-void': {
+                    '--main-bg-color': '#0a0814', '--text-color': '#c0c0d0', '--primary-accent': '#a855f7',
+                    '--secondary-accent': '#302050', '--button-bg': '#181028', '--button-hover-bg': '#282038',
+                    '--button-border': '#302050', '--button-hover-border': '#403060', '--title-color': '#a855f7',
+                    '--text-highlight': '#e0e0ff',
+                },
+                'theme-crimson-cult': {
+                    '--main-bg-color': '#1c0a0a', '--text-color': '#f0d8d8', '--primary-accent': '#c53030',
+                    '--secondary-accent': '#5c1a1a', '--button-bg': '#4a1a1a', '--button-hover-bg': '#6b2a2a',
+                    '--button-border': '#5c1a1a', '--button-hover-border': '#7c2a2a', '--title-color': '#c53030',
+                    '--text-highlight': '#ffe0e0',
+                },
+                'theme-arcane-green': {
+                    '--main-bg-color': '#0a1c0f', '--text-color': '#d8f0dd', '--primary-accent': '#38a169',
+                    '--secondary-accent': '#1a5c33', '--button-bg': '#1a4a2a', '--button-hover-bg': '#2a6b3a',
+                    '--button-border': '#1a5c33', '--button-hover-border': '#2a7c4a', '--title-color': '#38a169',
+                    '--text-highlight': '#e0ffe0',
+                },
+                'theme-mono-pixel': {
+                    '--main-bg-color': '#000000', '--text-color': '#00ff00', '--primary-accent': '#00ff00',
+                    '--secondary-accent': '#008000', '--button-bg': '#111111', '--button-hover-bg': '#222222',
+                    '--button-border': '#008000', '--button-hover-border': '#00aa00', '--title-color': '#00ff00',
+                    '--text-highlight': '#ccffcc',
+                }
+            };
+
+            const selectedTheme = themes[themeName] || themes['theme-classic-void']; 
+            for (const property in selectedTheme) {
+                document.documentElement.style.setProperty(property, selectedTheme[property]);
+            }
+             if(themeSelectEl) themeSelectEl.value = themeName; 
+        }
+
+
+        // --- Main Game Initialization ---
+        function initializeGame() {
+            console.log("Initializing game UI and event listeners...");
+
+            document.body.style.backgroundImage = `url('${BACKGROUND_IMAGE_URL}')`;
+            const logoImg = document.getElementById('company-logo');
+            if (logoImg) logoImg.src = COMPANY_LOGO_URL; 
+            const defaultVisImg = document.getElementById('visualize-image');
+            if (defaultVisImg) defaultVisImg.src = DEFAULT_VISUAL_URL; 
+
+
+            screensElements = {
+                'pre-menu-loading-screen': document.getElementById('pre-menu-loading-screen'),
+                'main-menu-screen': document.getElementById('main-menu-screen'),
+                'game-mode-screen': document.getElementById('game-mode-screen'),
+                'character-creation-screen': document.getElementById('character-creation-screen'),
+                'game-screen': document.getElementById('game-screen'),
+            };
+            preMenuLoadingScreenEl = document.getElementById('pre-menu-loading-screen');
+            companyLogoEl = document.getElementById('company-logo');
+            triggerWarningTextEl = document.getElementById('trigger-warning-text');
+            agreeBtnEl = document.getElementById('agree-btn');
+
+            mainMenuTitle = document.getElementById('main-title');
+            newGameBtn = document.getElementById('new-game-btn');
+            loadGameLabelBtn = document.getElementById('load-game-label-btn');
+            loadFileInputEl = document.getElementById('load-file-input');
+            settingsBtnMain = document.getElementById('settings-btn-main');
+            languageMenuBtn = document.getElementById('language-btn');
+            exitGameBtn = document.getElementById('exit-game-btn');
+
+            gameModeTitleEl = document.getElementById('game-mode-title');
+            modeLovecraftianBtnEl = document.getElementById('mode-lovecraftian-btn');
+            modeDndBtnEl = document.getElementById('mode-dnd-btn');
+            customGameModeInputEl = document.getElementById('custom-game-mode');
+            customModeLabelEl = document.getElementById('custom-mode-label');
+            partyNameInputEl = document.getElementById('party-name-input');
+            partyNameLabelEl = document.getElementById('party-name-label');
+            proceedToCharCreationBtnEl = document.getElementById('proceed-to-char-creation-btn');
+            backToMainMenuGMBtnEl = document.getElementById('back-to-main-menu-gm-btn');
+
+            charCreationTitleEl = document.getElementById('char-creation-title');
+            playerCountSelectEl = document.getElementById('player-count-select');
+            playerCountLabelEl = document.getElementById('player-count-label');
+            playerDetailsContainerEl = document.getElementById('player-details-container');
+            startAdventureBtnEl = document.getElementById('start-adventure-btn');
+            backToMenuCCBtnEl = document.getElementById('back-to-menu-cc-btn');
+
+            unfoldingNightmareTitleEl = document.getElementById('unfolding-nightmare-title');
+            storyDisplayEl = document.getElementById('story-display');
+            investigatorsTitleGSEl = document.getElementById('investigators-title-gs'); 
+            currentPlayerTurnIndicatorEl = document.getElementById('current-player-turn-indicator');
+            bossActionChoiceAreaEl = document.getElementById('boss-action-choice-area');
+            bossPromptTextEl = document.getElementById('boss-prompt-text');
+            bossActYesBtnEl = document.getElementById('boss-act-yes-btn');
+            bossActNoBtnEl = document.getElementById('boss-act-no-btn');
+            playerInputAreaEl = document.getElementById('player-input-area');
+            yourActionTitleEl = document.getElementById('your-action-title');
+            playerActionInputEl = document.getElementById('player-action-input');
+            submitActionBtnEl = document.getElementById('submit-action-btn');
+            openAbilitiesModalBtnEl = document.getElementById('open-abilities-modal-btn');
+            visualizeSceneBtnEl = document.getElementById('visualize-scene-btn');
+            settingsBtnGame = document.getElementById('settings-btn-game');
+            showInventoryBtnEl = document.getElementById('show-inventory-btn');
+            retryGMBtnEl = document.getElementById('retry-gm-btn');
+            askGMModalBtnEl = document.getElementById('ask-gm-modal-btn');
+            saveGameStateBtnEl = document.getElementById('save-game-state-btn');
+            mainMenuGSBtnEl = document.getElementById('main-menu-gs-btn');
+            fullscreenGameBtnEl = document.getElementById('fullscreen-btn-game');
+
+            inventoryModalEl = document.getElementById('inventory-modal');
+            inventoryTitleModalEl = document.getElementById('inventory-title-modal');
+            inventoryCharacterCardAreaEl = document.getElementById('inventory-character-card-area');
+            inventoryItemsListContainerEl = document.getElementById('inventory-items-list-container');
+            itemsListTitleEl = document.getElementById('items-list-title');
+            closeInventoryBtnEl = document.getElementById('close-inventory-btn');
+            abilitiesModalEl = document.getElementById('abilities-modal');
+            abilitiesTitleModalEl = document.getElementById('abilities-title-modal');
+            abilitiesContentEl = document.getElementById('abilities-content');
+            closeAbilitiesBtnEl = document.getElementById('close-abilities-btn');
+            askGMModalEl = document.getElementById('ask-gm-modal');
+            askGMTitleModalEl = document.getElementById('ask-gm-title-modal');
+            gmQuestionInputEl = document.getElementById('gm-question-input');
+            gmQuestionLabelEl = document.getElementById('gm-question-label');
+            submitGMQuestionBtnEl = document.getElementById('submit-gm-question-btn');
+            askGMAnswerAreaEl = document.getElementById('ask-gm-answer-area');
+            gmAnswerTextEl = document.getElementById('gm-answer-text');
+            closeAskGMModalBtnEl = document.getElementById('close-ask-gm-modal-btn');
+            visualizeModalEl = document.getElementById('visualize-scene-modal');
+            visualizeTitleModalEl = document.getElementById('visualize-title-modal');
+            visualizeImageContainerEl = document.getElementById('visualize-image-container');
+            visualizeImageEl = document.getElementById('visualize-image');
+            visualizeHintTextEl = document.getElementById('visualize-hint-text');
+            closeVisualizeModalBtnEl = document.getElementById('close-visualize-modal-btn');
+
+            settingsModalEl = document.getElementById('settings-modal');
+            settingsTitleModalEl = document.getElementById('settings-title-modal');
+            volumeSliderEl = document.getElementById('volume-slider');
+            volumeLabelEl = document.getElementById('volume-label');
+            themeSelectEl = document.getElementById('theme-select');
+            themeSelectLabelEl = document.getElementById('theme-select-label');
+            muteBtnSettings = document.getElementById('mute-btn-settings'); 
+            fullscreenSettingsBtn = document.getElementById('fullscreen-btn-settings');
+            aboutGameTextEl = document.getElementById('about-game-text');
+            aboutGameTitleEl = document.getElementById('about-game-title');
+            closeSettingsBtnEl = document.getElementById('close-settings-btn');
+
+            loadingOverlayEl = document.getElementById('loading-overlay');
+            if(loadingOverlayEl) loadingOverlayTextEl = loadingOverlayEl.querySelector('p');
+
+            // Initialize Tone.js Synths for button sounds
+            if (typeof Tone !== 'undefined') {
+                hoverSynth = new Tone.Synth({
+                    oscillator: { type: 'sine' },
+                    envelope: { attack: 0.005, decay: 0.05, sustain: 0, release: 0.1 },
+                    volume: -22 // Quieter
+                }).toDestination();
+
+                clickSynth = new Tone.Synth({
+                    oscillator: { type: 'triangle' },
+                    envelope: { attack: 0.005, decay: 0.05, sustain: 0, release: 0.1 },
+                    volume: -18
+                }).toDestination();
+            } else {
+                console.warn("Tone.js not loaded, button sounds will be disabled.");
+            }
+
+            // --- Event Listeners ---
+            if (agreeBtnEl) agreeBtnEl.addEventListener('click', async () => {
+                if (preMenuLoadingScreenEl) preMenuLoadingScreenEl.classList.remove('active-screen');
+                showScreen('main-menu-screen');
+                toggleFullscreen(); 
+                
+                if (await ensureAudioContext()) {
+                    console.log("Audio context ensured by agree button.");
+                    if (await loadAudioFiles()) { 
+                        console.log("Audio files loaded by agree button.");
+                        if (htmlAmbientPlayer) htmlAmbientPlayer.muted = isMuted; 
+                        if (htmlCombatPlayer) htmlCombatPlayer.muted = isMuted;
+                        applyVolume();
+                        await playMusic('ambient'); 
+                    } else {
+                        console.error("Failed to load audio files after agree.");
+                    }
+                } else {
+                    console.warn("Audio context could not be started by agree button. Sound features might be limited.");
+                }
+            });
+
+            if (newGameBtn) newGameBtn.addEventListener('click', async () => {
+                resetGameState(); 
+                if (await ensureAudioContext()) { // Ensure context first
+                    if (await loadAudioFiles()) { // Then load files
+                        applyVolume();
+                        await playMusic('ambient'); // Then play
+                    } else {
+                        console.error("Failed to load audio files on New Game.");
+                    }
+                } else {
+                     console.warn("Audio context not started on New Game. Music might not play until interaction.");
+                }
+                showScreen('game-mode-screen');
+            });
+
+            if (loadGameLabelBtn) loadGameLabelBtn.addEventListener('click', () => { if(loadFileInputEl) loadFileInputEl.click() });
+            if (loadFileInputEl) {
+                loadFileInputEl.addEventListener('change', async (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = async (e) => {
+                            let loadSuccess = false;
+                            try {
+                                const loadedState = JSON.parse(e.target.result);
+                                if (loadedState && loadedState.players && loadedState.storyLog) {
+                                    const currentLang = gameState.currentLanguage; 
+                                    gameState = loadedState;
+                                    gameState.currentLanguage = loadedState.currentLanguage || currentLang;
+                                    if (!gameState.supportedLanguages) gameState.supportedLanguages = ['en', 'es'];
+                                    gameState.partyName = loadedState.partyName || '';
+                                    gameState.currentMusicTrack = loadedState.currentMusicTrack || 'ambient';
+                                    gameState.volumeLevel = typeof loadedState.volumeLevel === 'number' ? loadedState.volumeLevel : 0.05;
+                                    gameState.currentTheme = loadedState.currentTheme || 'theme-classic-void';
+                                    
+                                    gameState.players.forEach(p => { 
+                                        p.action = p.action || "";
+                                        p.history = p.history || [];
+                                        p.inventory = p.inventory || [];
+                                        p.abilities = p.abilities || Array(5).fill(null).map((_, idx) => ({ name: `${S('defaultAbilityName')} ${idx + 1}`, desc: S('defaultAbilityDesc'), cost: parseInt(S('defaultAbilityCost')) || 0 }));
+                                        p.isMonster = p.isMonster || false;
+                                        p.isGod = p.isGod || false;
+                                        p.godType = p.godType || '';
+                                        p.maxHp = p.maxHp || (p.isGod ? 1000 : 100);
+                                        p.hp = (typeof p.hp === 'number') ? p.hp : p.maxHp;
+                                        p.sanity = (typeof p.sanity === 'number') ? p.sanity : (p.isGod ? 999 : 100);
+                                        p.portraitUrl = p.portraitUrl || DEFAULT_PORTRAIT_URL;
+                                    });
+                                    gameState.isAwaitingPlayerAction = gameState.isAwaitingPlayerAction !== undefined ? gameState.isAwaitingPlayerAction : true;
+                                    gameState.isGMProcessing = gameState.isGMProcessing !== undefined ? gameState.isGMProcessing : false;
+                                    gameState.gmPromptHistory = gameState.gmPromptHistory || [];
+                                    gameState.currentScreen = 'game-screen'; 
+                                    gameState.lastPlayerActions = loadedState.lastPlayerActions || [];
+
+
+                                    applyTheme(gameState.currentTheme);
+                                    if (volumeSliderEl) volumeSliderEl.value = gameState.volumeLevel * 100;
+                                    
+                                    if (!audioContextStarted && !await ensureAudioContext()) {
+                                        console.warn("Audio context not started on Load Game. Music might not play.");
+                                    }
+                                    applyVolume();
+                                    if (audioContextStarted) await playMusic(gameState.currentMusicTrack);
+
+                                    initializeGameScreen(); 
+                                    showScreen('game-screen'); 
+                                    loadSuccess = true;
+                                    console.log("Campaign loaded successfully!");
+                                } else {
+                                    console.error("Invalid save file format.");
+                                }
+                            } catch (error) {
+                                console.error("Error loading game:", error);
+                            } finally {
+                                if(loadFileInputEl) loadFileInputEl.value = ''; 
+                                const loadMsg = document.createElement('p');
+                                loadMsg.textContent = loadSuccess ? S('campaignLoaded') : S('failedLoad');
+                                loadMsg.className = `${loadSuccess ? 'text-green-400' : 'text-red-400'} text-center my-1 text-sm fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-[5000]`;
+                                document.body.appendChild(loadMsg);
+                                setTimeout(() => loadMsg.remove(), 3000);
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                });
+            }
+            if (languageMenuBtn) languageMenuBtn.addEventListener('click', () => {
+                const currentIndex = gameState.supportedLanguages.indexOf(gameState.currentLanguage);
+                gameState.currentLanguage = gameState.supportedLanguages[(currentIndex + 1) % gameState.supportedLanguages.length];
+                updateUITextForLanguage();
+            });
+            if (muteBtnSettings) muteBtnSettings.addEventListener('click', handleMuteToggle); 
+            if (exitGameBtn) {
+                exitGameBtn.addEventListener('click', () => {
+                    window.close(); 
+                });
+            }
+
+
+            // Game Mode Screen Listeners
+            const gameModeButtonsSetup = [modeLovecraftianBtnEl, modeDndBtnEl];
+            gameModeButtonsSetup.forEach(button => {
+                if (button) button.addEventListener('click', (e) => {
+                    gameState.selectedGameMode = e.target.dataset.mode;
+                    if(customGameModeInputEl) customGameModeInputEl.value = ''; 
+                    gameModeButtonsSetup.forEach(btn => {if(btn) btn.classList.remove('selected')});
+                    e.target.classList.add('selected');
+                    console.log("Selected game mode:", gameState.selectedGameMode);
+                });
+            });
+            if (customGameModeInputEl) customGameModeInputEl.addEventListener('input', () => {
+                if (customGameModeInputEl.value.trim() !== '') {
+                    gameState.selectedGameMode = 'custom';
+                    gameModeButtonsSetup.forEach(btn => {if(btn)btn.classList.remove('selected')}); 
+                } else if (gameState.selectedGameMode === 'custom') { 
+                    gameState.selectedGameMode = 'lovecraftian'; 
+                    if(modeLovecraftianBtnEl) modeLovecraftianBtnEl.classList.add('selected');
+                }
+            });
+            if (proceedToCharCreationBtnEl) proceedToCharCreationBtnEl.addEventListener('click', async () => {
+                if (gameState.selectedGameMode === 'custom') {
+                    if(customGameModeInputEl) gameState.customGameModePrompt = customGameModeInputEl.value.trim();
+                    if (!gameState.customGameModePrompt) {
+                        console.warn(S('customModePlaceholder'));
+                        const tempMsg = document.createElement('p');
+                        tempMsg.textContent = S('customModePlaceholder');
+                        tempMsg.className = 'text-red-400 text-center my-2';
+                        if(proceedToCharCreationBtnEl.parentNode) proceedToCharCreationBtnEl.parentNode.insertBefore(tempMsg, proceedToCharCreationBtnEl);
+                        setTimeout(() => tempMsg.remove(), 3000);
+                        return;
+                    }
+                }
+                if(partyNameInputEl) gameState.partyName = partyNameInputEl.value.trim();
+
+                if (!audioContextStarted && !await ensureAudioContext()) {
+                     console.warn("Audio context not started. Music might not play until interaction.");
+                }
+                if (audioContextStarted) {
+                    applyVolume();
+                    await playMusic('ambient');
+                }
+                showScreen('character-creation-screen');
+            });
+            if (backToMainMenuGMBtnEl) backToMainMenuGMBtnEl.addEventListener('click', () => showScreen('main-menu-screen'));
+
+            // Character Creation Listeners
+            if (backToMenuCCBtnEl) backToMenuCCBtnEl.addEventListener('click', () => showScreen('game-mode-screen'));
+            if (startAdventureBtnEl) startAdventureBtnEl.addEventListener('click', async () => {
+                showLoading("gmWeavesNarrative");
+                gameState.players = []; 
+                const count = playerCountSelectEl ? parseInt(playerCountSelectEl.value) : 1;
+                let allDetailsCollected = true;
+
+                for (let i = 0; i < count; i++) {
+                    const nameInput = document.getElementById(`player-name-${i}`);
+                    const descInput = document.getElementById(`player-desc-${i}`);
+                    const monsterCheckbox = document.getElementById(`player-monster-${i}`);
+                    const godCheckbox = document.getElementById(`player-god-${i}`);
+                    const godTypeSelect = document.getElementById(`god-type-${i}`);
+                    const customGodNameInput = document.getElementById(`custom-god-name-${i}`);
+                    const portraitPreview = document.getElementById(`portrait-preview-${i}`);
+
+                    const name = nameInput ? nameInput.value.trim() : '';
+                    const description = descInput ? descInput.value.trim() : '';
+                    const isMonsterChecked = monsterCheckbox ? monsterCheckbox.checked : false;
+                    const isGodChecked = godCheckbox ? godCheckbox.checked : false;
+                    let godType = '';
+                    if (isGodChecked && godTypeSelect) {
+                        godType = godTypeSelect.value;
+                        if (godType === 'custom' && customGodNameInput) {
+                            godType = customGodNameInput.value.trim() || 'Custom Entity';
+                        }
+                    }
+
+                    if (!name || !description) {
+                        console.error(`Missing name or description for Player ${i + 1}.`);
+                        const errorDiv = document.createElement('p');
+                        errorDiv.textContent = S('errorPlayerDetails', {NUM: i + 1});
+                        errorDiv.className = 'text-red-400 text-center my-2';
+                        if (playerDetailsContainerEl) playerDetailsContainerEl.appendChild(errorDiv); 
+                        setTimeout(() => errorDiv.remove(), 3000);
+                        allDetailsCollected = false;
+                        break; 
+                    }
+                    gameState.players.push({
+                        id: i, name: name, description: description,
+                        hp: isGodChecked ? 1000 : 100, 
+                        maxHp: isGodChecked ? 1000 : 100,
+                        sanity: isGodChecked ? 999 : 100, 
+                        inventory: [], abilities: [],
+                        isMonster: isMonsterChecked && !isGodChecked, 
+                        isGod: isGodChecked, godType: godType,
+                        portraitUrl: portraitPreview && (portraitPreview.src.startsWith('data:image') || portraitPreview.src.startsWith('./assets/')) ? portraitPreview.src : DEFAULT_PORTRAIT_URL,
+                        history: [`${name} (${isGodChecked ? S('godLabel') : (isMonsterChecked ? S('monsterLabel') : S('characterLabel'))}): ${description}`], 
+                        action: "" 
+                    });
+                }
+
+                if (!allDetailsCollected) {
+                    hideLoading();
+                    return; 
+                }
+
+                for (let player of gameState.players) {
+                    try {
+                        let attributePromptInstructionKey;
+                        let attributePromptPreamble = "";
+                        if (gameState.selectedGameMode === 'custom' && gameState.customGameModePrompt) {
+                             attributePromptPreamble = `Based on a custom theme: "${gameState.customGameModePrompt}", this character is described as: "${player.description}". `;
+                        } else if (gameState.selectedGameMode === 'dnd') {
+                             attributePromptPreamble = `For a D&D style fantasy adventure, this character is described as: "${player.description}". `;
+                        } else { 
+                             attributePromptPreamble = `Based on a Lovecraftian horror setting, this character is described as: "${player.description}". `;
+                        }
+
+
+                        if (player.isGod) {
+                            attributePromptInstructionKey = 'itemAbilityPromptInstruction_God';
+                            attributePromptPreamble = `Based on a ${gameState.selectedGameMode === 'custom' ? `custom theme: "${gameState.customGameModePrompt}"` : `${gameState.selectedGameMode} setting`}, this player is an ENTITY known as ${player.godType}, described as: "${player.description}". `;
+                        } else if (player.isMonster) {
+                            attributePromptInstructionKey = 'itemAbilityPromptInstruction_Monster';
+                            attributePromptPreamble = `Based on a ${gameState.selectedGameMode === 'custom' ? `custom theme: "${gameState.customGameModePrompt}"` : `${gameState.selectedGameMode} setting`}, this player is a CREATURE, described as: "${player.description}". `;
+                        } else {
+                            attributePromptInstructionKey = 'itemAbilityPromptInstruction_Investigator';
+                        }
+                        
+                        let attributePrompt = `${attributePromptPreamble}${S(attributePromptInstructionKey)}`;
+                        attributePrompt = attributePrompt.replace(/{GOD_TYPE}/g, player.godType); 
+                        attributePrompt = attributePrompt.replace(`Respond in English.`, `Respond in ${gameState.currentLanguage === 'es' ? 'Español' : 'English'}.`);
+
+
+                        const aiResponse = await callGeminiAPI(attributePrompt, []); 
+                        parseAndAssignItemsAndAbilities(player, aiResponse);
+                        const abilitiesListText = player.abilities.map(ab => `${ab.name} (Cost: ${ab.cost})`).join(', ');
+                        player.history.push(S('initialEndowmentHistory', {
+                            ITEM: player.inventory.join(', ') || (player.isMonster || player.isGod ? S('nothingOfNote') : S('defaultItem')),
+                            ABILITIES_LIST: abilitiesListText || S('noAbility')
+                        }));
+                    } catch (error) {
+                        console.error(`Error generating details for ${player.name}:`, error);
+                        player.history.push(S('endowmentMysteryHistory'));
+                        if (!player.isMonster && !player.isGod && player.inventory.length === 0) player.inventory.push(S('defaultItem'));
+                        player.abilities = Array(5).fill(null).map((_, idx) => ({
+                            name: `${S('defaultAbilityName')} ${idx + 1}`,
+                            desc: S('defaultAbilityDesc'),
+                            cost: parseInt(S('defaultAbilityCost')) || 0
+                        }));
+                    }
+                }
+
+                try {
+                    let scenarioPreamble = "";
+                    if (gameState.selectedGameMode === 'custom' && gameState.customGameModePrompt) {
+                        scenarioPreamble = `You are the Game Master for a custom visual novel based on this theme: "${gameState.customGameModePrompt}". `;
+                    } else if (gameState.selectedGameMode === 'dnd') {
+                        scenarioPreamble = `You are the Dungeon Master for a D&D style fantasy adventure. `;
+                    } else {
+                        let modeDescription = "Lovecraftian horror"; 
+                        scenarioPreamble = `You are the Game Master for a ${modeDescription} visual novel. `;
+                    }
+                    if (gameState.partyName && gameState.partyName.trim() !== "" && gameState.partyName !== S('partyNamePlaceholder')) {
+                        scenarioPreamble += `The player characters are part of a group known as "${gameState.partyName}". `;
+                    }
+                    let scenarioPrompt = `${scenarioPreamble}${S('scenarioStartInstruction')} Respond in ${gameState.currentLanguage === 'es' ? 'Español' : 'English'}.`;
+
+                    gameState.currentScenario = await callGeminiAPI(scenarioPrompt, []); 
+                    gameState.storyLog.push({ speaker: 'GM', text: gameState.currentScenario });
+                    gameState.gmPromptHistory.push({role: "user", parts: [{text: scenarioPrompt}]});
+                    gameState.gmPromptHistory.push({role: "model", parts: [{text: gameState.currentScenario}]});
+
+                } catch (error) {
+                    console.error("Error generating scenario:", error);
+                    gameState.currentScenario = S('defaultScenario'); 
+                    gameState.storyLog.push({ speaker: 'GM', text: gameState.currentScenario });
+                    gameState.gmPromptHistory.push({role: "user", parts: [{text: "Failed to generate scenario, provide a default."}]});
+                    gameState.gmPromptHistory.push({role: "model", parts: [{text: gameState.currentScenario}]});
+                }
+
+                hideLoading();
+                initializeGameScreen(); 
+                showScreen('game-screen'); 
+            });
+            if (playerCountSelectEl) playerCountSelectEl.addEventListener('change', updatePlayerDetailForms);
+
+            // Game Screen Action Listeners
+            if (visualizeSceneBtnEl) visualizeSceneBtnEl.addEventListener('click', async () => {
+                if (!audioContextStarted && !await ensureAudioContext()) {
+                     console.warn("User interaction for audio not yet detected for visualize scene.");
+                }
+                showLoading("gmWeavesNarrative"); 
+                const sanityCostForVision = 3;
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+
+                if (!currentPlayer || (!currentPlayer.isGod && currentPlayer.sanity < sanityCostForVision)) {
+                    hideLoading();
+                    const errorMsg = document.createElement('p');
+                    errorMsg.textContent = S('visionCostError');
+                    errorMsg.className = "text-red-400 text-center my-1 text-sm fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-[5000]";
+                    document.body.appendChild(errorMsg);
+                    setTimeout(() => errorMsg.remove(), 3000);
+                    return;
+                }
+                if (!currentPlayer.isGod) {
+                    currentPlayer.sanity -= sanityCostForVision;
+                    if (currentPlayer.sanity < 0) currentPlayer.sanity = 0;
+                    currentPlayer.history.push(S('sanityHistory', {CHANGE: -sanityCostForVision, SANITY: currentPlayer.sanity, REASON: "gazing into the abyss"}));
+                }
+                
+                gameState.storyLog.push({ speaker: 'GM_EFFECT', text: S('visionNotification', {PLAYER_NAME: currentPlayer.name}) });
+                updateStoryDisplay(); 
+
+                const lastGMEntry = gameState.storyLog.filter(entry => entry.speaker === 'GM').pop();
+                let sceneDescriptionForImage = "A haunting Lovecraftian horror scene. ";
+                if(gameState.selectedGameMode === 'dnd') {
+                    sceneDescriptionForImage = "A vibrant fantasy scene from a D&D adventure. ";
+                }
+
+                if(lastGMEntry) {
+                    sceneDescriptionForImage += lastGMEntry.text.substring(0, 200); 
+                } else {
+                    sceneDescriptionForImage += gameState.currentScenario.substring(0, 200); 
+                }
+                sceneDescriptionForImage += `. Digital painting, detailed, atmospheric, mysterious.`;
+                if(gameState.selectedGameMode === 'dnd') {
+                     sceneDescriptionForImage += ` High fantasy aesthetic.`;
+                } else {
+                     sceneDescriptionForImage += ` Cosmic horror aesthetic.`;
+                }
+                
+                const hintPromptForGemini = `Based on the scene described as: "${sceneDescriptionForImage.substring(0,300)}", ${S('imageHintPromptAddition').replace('Respond in English.', `Respond in ${gameState.currentLanguage === 'es' ? 'Español' : 'English'}.`)}`;
+
+                try {
+                    const imageUrl = await callImagenAPI(sceneDescriptionForImage); 
+                    if(visualizeImageEl) visualizeImageEl.src = imageUrl;
+                    if(visualizeImageEl) visualizeImageEl.alt = sceneDescriptionForImage.substring(0,100) + "...";
+
+                    const hintResponse = await callGeminiAPI(hintPromptForGemini, []); 
+                    const hintMatch = hintResponse.match(/(?:HINT|PISTA):\s*(.*)/i);
+                    let hintText = S('visionFailed'); 
+                    if (hintMatch && hintMatch[1]) {
+                        hintText = hintMatch[1].trim();
+                        currentPlayer.history.push(`${S('visionHintPrefix')}${hintText}`); 
+                    }
+                    if(visualizeHintTextEl) visualizeHintTextEl.textContent = `${S('visionHintPrefix')}${hintText}`;
+                    
+                    if(visualizeTitleModalEl) visualizeTitleModalEl.textContent = S('visualizeModalTitle');
+                    if(closeVisualizeModalBtnEl) closeVisualizeModalBtnEl.textContent = S('visualizeModalClose');
+                    if(visualizeModalEl) visualizeModalEl.classList.add('active-modal');
+
+                } catch (error) {
+                    console.error("Error during visualization:", error);
+                    if(visualizeImageEl) visualizeImageEl.src = DEFAULT_VISUAL_URL; 
+                    if(visualizeImageEl) visualizeImageEl.alt = S('imageAltFailed');
+                    if(visualizeHintTextEl) visualizeHintTextEl.textContent = S('visionFailed');
+                    const errorMsg = document.createElement('p');
+                    errorMsg.textContent = S('visionFailed') + " (Check console for details)";
+                    errorMsg.className = "text-red-400 text-center my-1 text-sm";
+                    if(visualizeImageContainerEl) visualizeImageContainerEl.appendChild(errorMsg); 
+                    setTimeout(() => errorMsg.remove(), 3000);
+                } finally {
+                    hideLoading();
+                }
+            });
+
+            if (submitActionBtnEl) submitActionBtnEl.addEventListener('click', () => handlePlayerAction('text_action'));
+            if (openAbilitiesModalBtnEl) openAbilitiesModalBtnEl.addEventListener('click', () => { const cP = gameState.players[gameState.currentPlayerIndex]; if (cP) populateAbilitiesModal(cP);});
+            if (bossActYesBtnEl) bossActYesBtnEl.addEventListener('click', () => {
+                if(playerInputAreaEl) playerInputAreaEl.classList.remove('hidden');
+                if(bossActionChoiceAreaEl) bossActionChoiceAreaEl.classList.add('hidden');
+                if(playerActionInputEl) playerActionInputEl.focus();
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                if(openAbilitiesModalBtnEl && currentPlayer) openAbilitiesModalBtnEl.disabled = !(currentPlayer.abilities && currentPlayer.abilities.length > 0 && currentPlayer.abilities[0].name !== S('noAbility'));
+            });
+            if (bossActNoBtnEl) bossActNoBtnEl.addEventListener('click', async () => {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                if (!currentPlayer) { console.error("Boss not found"); return; }
+                currentPlayer.action = `${currentPlayer.name} observes, taking no direct action this turn.`;
+                gameState.storyLog.push({ speaker: currentPlayer.name, text: currentPlayer.action });
+                updateStoryDisplay();
+
+                gameState.isAwaitingPlayerAction = false; 
+                await processTurn(); 
+                updatePlayerTurnIndicator(); 
+            });
+            if (askGMModalBtnEl) askGMModalBtnEl.addEventListener('click', () => {
+                if(gmQuestionInputEl) gmQuestionInputEl.value = '';
+                if(askGMAnswerAreaEl) askGMAnswerAreaEl.classList.add('hidden');
+                if(gmAnswerTextEl) gmAnswerTextEl.textContent = '';
+                if(askGMModalEl) askGMModalEl.classList.add('active-modal');
+                if(gmQuestionInputEl) gmQuestionInputEl.focus();
+            });
+            if (showInventoryBtnEl) showInventoryBtnEl.addEventListener('click', toggleInventoryModal);
+            if (retryGMBtnEl) retryGMBtnEl.addEventListener('click', retryGMAction);
+            if (saveGameStateBtnEl) saveGameStateBtnEl.addEventListener('click', () => {
+                 try {
+                    const gameDataString = JSON.stringify(gameState);
+                    const blob = new Blob([gameDataString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-").replace("T", "_");
+                    a.download = `whispers_of_the_void_save_${timestamp}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    console.log("Campaign saved!");
+                    const saveMsg = document.createElement('p');
+                    saveMsg.textContent = S('campaignSaved');
+                    saveMsg.className = "text-green-400 text-center my-1 text-sm fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-[5000]";
+                    document.body.appendChild(saveMsg);
+                    setTimeout(() => saveMsg.remove(), 3000);
+
+                } catch (error) {
+                    console.error("Error saving game:", error);
+                    const errorMsg = document.createElement('p');
+                    errorMsg.textContent = S('errorSaving');
+                    errorMsg.className = "text-red-400 text-center my-1 text-sm fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-[5000]";
+                    document.body.appendChild(errorMsg);
+                    setTimeout(() => errorMsg.remove(), 3000);
+                }
+            });
+            if (fullscreenGameBtnEl) fullscreenGameBtnEl.addEventListener('click', toggleFullscreen);
+            if (mainMenuGSBtnEl) mainMenuGSBtnEl.addEventListener('click', async () => {
+                if (!audioContextStarted && !await ensureAudioContext()) {
+                     console.warn("User interaction for audio not yet detected for Return to Main Menu.");
+                }
+                resetGameState();
+                if(audioContextStarted) { 
+                    applyVolume();
+                    await playMusic('ambient');
+                }
+                showScreen('main-menu-screen');
+            });
+            if (closeInventoryBtnEl) closeInventoryBtnEl.addEventListener('click', () => inventoryModalEl.classList.remove('active-modal'));
+            if (closeAbilitiesBtnEl) closeAbilitiesBtnEl.addEventListener('click', () => abilitiesModalEl.classList.remove('active-modal'));
+            if (closeAskGMModalBtnEl) closeAskGMModalBtnEl.addEventListener('click', () => askGMModalEl.classList.remove('active-modal'));
+            if (closeVisualizeModalBtnEl) closeVisualizeModalBtnEl.addEventListener('click', () => visualizeModalEl.classList.remove('active-modal'));
+            
+            if (submitGMQuestionBtnEl) submitGMQuestionBtnEl.addEventListener('click', async () => {
+                if(!gmQuestionInputEl || !askGMAnswerAreaEl || !gmAnswerTextEl) return;
+                const question = gmQuestionInputEl.value.trim();
+                if (!question) return;
+
+                showLoading("gmPonders");
+                submitGMQuestionBtnEl.disabled = true;
+
+                let playerStatesSummary = gameState.players.map(p => {
+                    let type = p.isGod ? S('godLabel') : (p.isMonster ? S('monsterLabel') : S('characterLabel'));
+                    return `${p.name} (${type}, Sanity: ${p.sanity})`;
+                }).join('; ');
+
+                const prompt = S('askGMQuestionPrompt', {
+                    PLAYER_QUESTION: question,
+                    CURRENT_SCENARIO: gameState.currentScenario.substring(0, 500), 
+                    PLAYER_STATES: playerStatesSummary
+                }).replace(`Respond in English.`, `Respond in ${gameState.currentLanguage === 'es' ? 'Español' : 'English'}.`);
+
+                try {
+                    const answer = await callGeminiAPI(prompt, []); 
+                    gmAnswerTextEl.textContent = answer;
+                    askGMAnswerAreaEl.classList.remove('hidden');
+                } catch (error) {
+                    gmAnswerTextEl.textContent = S('gmErrorGeneric');
+                    askGMAnswerAreaEl.classList.remove('hidden');
+                    console.error("Error asking GM:", error);
+                } finally {
+                    hideLoading();
+                    submitGMQuestionBtnEl.disabled = false;
+                }
+            });
+
+            // Settings Modal Listeners
+            const openSettingsButtons = [settingsBtnMain, settingsBtnGame];
+            openSettingsButtons.forEach(btn => {
+                if (btn) btn.addEventListener('click', () => {
+                    if (settingsModalEl) settingsModalEl.classList.add('active-modal');
+                    if (volumeSliderEl) volumeSliderEl.value = gameState.volumeLevel * 100;
+                    if (themeSelectEl) themeSelectEl.value = gameState.currentTheme;
+                    updateUITextForLanguage(); 
+                });
+            });
+            if (closeSettingsBtnEl) closeSettingsBtnEl.addEventListener('click', () => {
+                if (settingsModalEl) settingsModalEl.classList.remove('active-modal');
+            });
+            if (volumeSliderEl) volumeSliderEl.addEventListener('input', (e) => {
+                gameState.volumeLevel = parseFloat(e.target.value) / 100;
+                applyVolume();
+            });
+            if (themeSelectEl) themeSelectEl.addEventListener('change', (e) => {
+                applyTheme(e.target.value);
+            });
+            if (fullscreenSettingsBtn) fullscreenSettingsBtn.addEventListener('click', toggleFullscreen);
+
+            // Add sound effects to all buttons
+            const allButtons = document.querySelectorAll('button, label[for="load-file-input"]');
+            allButtons.forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    if (audioContextStarted && !isMuted && typeof Tone !== 'undefined' && Tone.context.state === 'running' && hoverSynth) {
+                        try { hoverSynth.triggerAttackRelease("C2", "0.05", Tone.now()); } catch (e) { console.warn("Hover sound error:", e); }
+                    }
+                });
+                button.addEventListener('click', () => {
+                    if (audioContextStarted && !isMuted && typeof Tone !== 'undefined' && Tone.context.state === 'running' && clickSynth) {
+                        try { clickSynth.triggerAttackRelease("E3", "0.05", Tone.now()); } catch (e) { console.warn("Click sound error:", e); }
+                    }
+                });
+            });
+
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key.toLowerCase() === 'i' && gameState.currentScreen === 'game-screen') {
+                    if (document.activeElement !== playerActionInputEl &&
+                        document.activeElement !== gmQuestionInputEl &&
+                        (!abilitiesModalEl || !abilitiesModalEl.classList.contains('active-modal')) &&
+                        (!askGMModalEl || !askGMModalEl.classList.contains('active-modal')) &&
+                        (!visualizeModalEl || !visualizeModalEl.classList.contains('active-modal')) &&
+                        (!settingsModalEl || !settingsModalEl.classList.contains('active-modal')) ) {
+                        e.preventDefault(); 
+                        toggleInventoryModal();
+                    }
+                }
+                 if (e.key === 'Escape') { 
+                      let modalClosed = false;
+                       if(inventoryModalEl && inventoryModalEl.classList.contains('active-modal')) { inventoryModalEl.classList.remove('active-modal'); modalClosed = true;}
+                       else if(abilitiesModalEl && abilitiesModalEl.classList.contains('active-modal')) { abilitiesModalEl.classList.remove('active-modal'); modalClosed = true;}
+                       else if(askGMModalEl && askGMModalEl.classList.contains('active-modal')) { askGMModalEl.classList.remove('active-modal'); modalClosed = true;}
+                       else if(visualizeModalEl && visualizeModalEl.classList.contains('active-modal')) { visualizeModalEl.classList.remove('active-modal'); modalClosed = true;}
+                       else if(settingsModalEl && settingsModalEl.classList.contains('active-modal')) { settingsModalEl.classList.remove('active-modal'); modalClosed = true;}
+                       if (modalClosed) e.preventDefault(); 
+                 }
+            });
+
+            if (playerActionInputEl) playerActionInputEl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) { 
+                    e.preventDefault(); 
+                    handlePlayerAction('text_action');
+                }
+            });
+
+            gameState.storyLog = [{ speaker: 'GM', text: S('initialStory') }];
+            if (storyDisplayEl) storyDisplayEl.innerHTML = gameState.storyLog[0].text;
+            if (loadingOverlayTextEl) loadingOverlayTextEl.textContent = S('loadingMessage');
+
+            applyTheme(gameState.currentTheme);
+            if (volumeSliderEl) volumeSliderEl.value = gameState.volumeLevel * 100;
+            applyVolume();
+
+
+            updatePlayerDetailForms(); 
+
+            if (preMenuLoadingScreenEl) { 
+                if (screensElements['main-menu-screen']) screensElements['main-menu-screen'].classList.remove('active-screen');
+                preMenuLoadingScreenEl.classList.add('active-screen');
+            } else { 
+                showScreen('main-menu-screen');
+            }
+            updateUITextForLanguage(); 
+            hideLoading(); 
+        }
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('RAW UNHANDLED REJECTION EVENT:', event);
+            console.error('RAW UNHANDLED REJECTION REASON:', event.reason);
+            let displayMessage = "An unexpected error occurred. Check console for details.";
+
+            if (event.reason instanceof Error) {
+                console.error("Unhandled Rejection Type: Error instance");
+                console.error("Unhandled Rejection Name:", event.reason.name);
+                console.error("Unhandled Rejection Message:", event.reason.message);
+                if (event.reason.stack) {
+                    console.error("Unhandled Rejection Stack:", event.reason.stack);
+                }
+                displayMessage = event.reason.message || event.reason.name || "Unnamed Error";
+            } else if (typeof event.reason === 'string') {
+                console.error("Unhandled Rejection Type: String");
+                displayMessage = event.reason;
+            } else if (event.reason && typeof event.reason.message === 'string') {
+                console.error("Unhandled Rejection Type: Error-like object");
+                displayMessage = event.reason.message;
+            } else if (event.reason) {
+                console.error("Unhandled Rejection Type: Object");
+                try {
+                    displayMessage = JSON.stringify(event.reason);
+                } catch (e) {
+                    console.error("Failed to stringify unhandled rejection reason:", e);
+                    displayMessage = "Could not stringify unhandled rejection reason (see console for raw reason).";
+                }
+            } else {
+                 console.error("Unhandled Rejection Type: Unknown (reason is falsy)");
+                 displayMessage = "Unknown error (empty or falsy rejection reason).";
+            }
+
+            const errorMsgId = 'unhandled-rejection-message';
+            let errorMsgElement = document.getElementById(errorMsgId);
+            if (!errorMsgElement) {
+                errorMsgElement = document.createElement('p');
+                errorMsgElement.id = errorMsgId;
+                errorMsgElement.className = "text-red-500 text-center p-2 bg-red-900 rounded fixed top-0 left-1/2 transform -translate-x-1/2 z-[5000] w-3/4 max-w-lg";
+                document.body.appendChild(errorMsgElement);
+            }
+            errorMsgElement.textContent = `Unhandled Error: ${displayMessage}`;
+
+            setTimeout(() => {
+                if (errorMsgElement) errorMsgElement.remove();
+            }, 7000); 
+        });
+
+        document.addEventListener('DOMContentLoaded', initializeGame);
+
+        console.log("Whispers of the Void script initialized. Audio will attempt to play on user interaction.");
+    </script>
+</body>
+</html>
